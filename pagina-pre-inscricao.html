@@ -13,34 +13,69 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --dark-blue:    #09090e;
-      --deep-blue:    #1b2344;
-      --royal-blue:   #11257c;
-      --vibrant-blue: #6171ff;
-      --baby-blue:    #959fff;
-      --cold-white:   #f2f2f2;
+      --dark:    #09090e;
+      --deep:    #1b2344;
+      --royal:   #11257c;
+      --blue:    #6171ff;
+      --baby:    #959fff;
+      --white:   #f2f2f2;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
       font-family: 'DM Sans', sans-serif;
-      background: var(--dark-blue);
-      color: var(--cold-white);
+      background: var(--dark);
+      color: var(--white);
       overflow-x: hidden;
     }
 
-    /* ── NOISE ── */
-    body::before {
-      content: '';
-      position: fixed;
+    /* ── shared noise ── */
+    .noise {
+      position: absolute;
       inset: 0;
       pointer-events: none;
-      z-index: 1000;
-      opacity: .35;
+      z-index: 3;
+      opacity: .45;
       mix-blend-mode: overlay;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 200px 200px;
+    }
+
+    /* ── shared section wrapper ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 80px; }
+
+    /* ── shared label ── */
+    .label {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--blue);
+      opacity: .9;
+    }
+
+    /* ── shared CTA button ── */
+    .btn {
+      display: inline-block;
+      background: var(--blue);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 17px 40px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      letter-spacing: .01em;
+    }
+    .btn:hover {
+      background: var(--baby);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(97,113,255,.35);
     }
 
     /* ════════════════════════════════
@@ -49,262 +84,288 @@
     #hero {
       position: relative;
       min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      overflow: hidden;
-      background: var(--dark-blue);
-    }
-
-    /* diagonal stripe texture */
-    #hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: repeating-linear-gradient(
-        -52deg,
-        transparent 0px,
-        transparent 28px,
-        rgba(97,113,255,.035) 28px,
-        rgba(97,113,255,.035) 29px
-      );
-      pointer-events: none;
-    }
-
-    /* heptagon background */
-    .hero-heptagono {
-      position: absolute;
-      right: -80px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 720px;
-      height: 720px;
-      object-fit: contain;
-      opacity: .18;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    /* left content */
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      padding: 100px 64px 80px 80px;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      background: var(--dark);
+    }
+
+    #beams-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* subtle vignette at bottom */
+    #hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 220px;
+      background: linear-gradient(to bottom, transparent, var(--dark));
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* nav */
+    .hero-nav {
+      position: relative;
+      z-index: 10;
+      padding: 40px 80px;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-nav img { height: 44px; width: auto; }
+
+    /* centered content */
+    .hero-body {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 80px 120px;
       gap: 28px;
     }
 
-    .hero-logo {
-      height: 52px;
-      width: auto;
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(97,113,255,.35);
+      border-radius: 100px;
+      padding: 7px 18px;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--baby);
+      background: rgba(97,113,255,.08);
+    }
+
+    .hero-badge span {
+      width: 5px; height: 5px;
+      background: var(--blue);
+      border-radius: 50%;
+      display: inline-block;
     }
 
     .hero-headline {
-      font-size: clamp(2rem, 3.4vw, 3rem);
+      font-size: clamp(2rem, 4vw, 3.4rem);
       font-weight: 800;
       line-height: 1.15;
-      color: var(--vibrant-blue);
-      max-width: 520px;
+      max-width: 820px;
+      background: linear-gradient(135deg, var(--white) 40%, var(--baby) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* highlight word in vibrant blue */
+    .hero-headline em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--blue), var(--baby));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .hero-sub {
-      font-size: clamp(.95rem, 1.1vw, 1.1rem);
+      font-size: clamp(.95rem, 1.15vw, 1.1rem);
       font-weight: 500;
-      line-height: 1.65;
-      color: var(--cold-white);
-      max-width: 480px;
-      opacity: .88;
+      line-height: 1.7;
+      color: var(--white);
+      opacity: .72;
+      max-width: 640px;
     }
-
-    .btn-primary {
-      display: inline-block;
-      background: var(--vibrant-blue);
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      padding: 16px 36px;
-      border-radius: 8px;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: background .2s, transform .15s;
-      align-self: flex-start;
-      letter-spacing: .01em;
-    }
-    .btn-primary:hover { background: var(--baby-blue); transform: translateY(-1px); }
-
-    /* right image area */
-    .hero-image-wrap {
-      position: relative;
-      height: 100vh;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-    }
-
-    .hero-founders {
-      position: relative;
-      z-index: 2;
-      height: 95vh;
-      max-height: 820px;
-      width: auto;
-      object-fit: contain;
-      object-position: bottom;
-      display: block;
-    }
-
-    /* Circular Dealwise badge */
-    .badge-wrap {
-      position: absolute;
-      bottom: 48px;
-      right: 48px;
-      z-index: 3;
-      width: 90px;
-      height: 90px;
-    }
-    .badge-wrap svg { animation: spin 14s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ════════════════════════════════
        NUMBERS
     ════════════════════════════════ */
     #numbers {
-      background: var(--deep-blue);
-      padding: 88px 80px;
+      background: var(--deep);
+      padding: 80px 0;
+      position: relative;
+      overflow: hidden;
     }
 
-    .section-label {
-      font-size: .78rem;
-      font-weight: 700;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--vibrant-blue);
-      margin-bottom: 48px;
-      opacity: .9;
+    /* subtle diagonal lines */
+    #numbers::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        -52deg,
+        transparent 0px, transparent 30px,
+        rgba(97,113,255,.025) 30px, rgba(97,113,255,.025) 31px
+      );
+      pointer-events: none;
     }
+
+    #numbers .container { position: relative; z-index: 2; }
+
+    #numbers .label { margin-bottom: 40px; display: block; }
 
     .numbers-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 2px;
+      gap: 1px;
+      background: rgba(97,113,255,.1);
+      border: 1px solid rgba(97,113,255,.1);
+      border-radius: 12px;
+      overflow: hidden;
     }
 
     .number-card {
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(97,113,255,.12);
-      padding: 36px 28px;
-      border-radius: 4px;
+      background: rgba(9,9,14,.6);
+      padding: 40px 28px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      transition: background .2s;
     }
+    .number-card:hover { background: rgba(97,113,255,.06); }
 
     .number-big {
-      font-size: clamp(2rem, 2.8vw, 2.6rem);
+      font-size: clamp(1.8rem, 2.6vw, 2.4rem);
       font-weight: 800;
       line-height: 1;
-      background: linear-gradient(135deg, var(--vibrant-blue), var(--baby-blue));
+      background: linear-gradient(135deg, var(--blue), var(--baby));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
     .number-desc {
-      font-size: .88rem;
+      font-size: .85rem;
       font-weight: 500;
-      line-height: 1.5;
-      color: var(--cold-white);
-      opacity: .75;
+      line-height: 1.55;
+      color: var(--white);
+      opacity: .65;
     }
 
     /* ════════════════════════════════
        CONTEXT
     ════════════════════════════════ */
     #context {
-      background: var(--dark-blue);
-      padding: 100px 80px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: center;
-    }
-
-    .context-text h2 {
-      font-size: clamp(1.5rem, 2.2vw, 2rem);
-      font-weight: 800;
-      line-height: 1.25;
-      color: var(--cold-white);
-      margin-bottom: 28px;
-    }
-
-    .context-text h2 span {
-      color: var(--vibrant-blue);
-    }
-
-    .context-text p {
-      font-size: 1rem;
-      font-weight: 500;
-      line-height: 1.75;
-      color: var(--cold-white);
-      opacity: .8;
-      margin-bottom: 20px;
-    }
-
-    .context-text p:last-child { margin-bottom: 0; }
-
-    .context-visual {
+      background: var(--dark);
+      padding: 100px 0;
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
-    .context-heptagono {
-      width: 100%;
-      max-width: 380px;
-      opacity: .55;
+    /* faint radial glow */
+    #context::before {
+      content: '';
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%,-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(97,113,255,.07) 0%, transparent 70%);
+      pointer-events: none;
     }
+
+    #context .container {
+      position: relative;
+      z-index: 2;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 80px;
+    }
+
+    #context .label { margin-bottom: 32px; display: block; }
+
+    #context h2 {
+      font-size: clamp(1.7rem, 2.6vw, 2.4rem);
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--white);
+      margin-bottom: 36px;
+    }
+
+    #context h2 em {
+      font-style: normal;
+      color: var(--blue);
+    }
+
+    #context p {
+      font-size: 1.05rem;
+      font-weight: 500;
+      line-height: 1.8;
+      color: var(--white);
+      opacity: .75;
+      margin-bottom: 22px;
+    }
+
+    #context p:last-of-type { margin-bottom: 0; }
 
     /* ════════════════════════════════
        CITIES
     ════════════════════════════════ */
     #cities {
-      background: var(--deep-blue);
-      padding: 88px 80px;
+      background: var(--deep);
+      padding: 88px 0;
       text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
+    #cities::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        -52deg,
+        transparent 0px, transparent 30px,
+        rgba(97,113,255,.025) 30px, rgba(97,113,255,.025) 31px
+      );
+      pointer-events: none;
+    }
+
+    #cities .container { position: relative; z-index: 2; }
+
+    #cities .label { margin-bottom: 20px; display: block; }
+
     #cities h2 {
-      font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+      font-size: clamp(1.7rem, 2.6vw, 2.4rem);
       font-weight: 800;
-      color: var(--cold-white);
+      color: var(--white);
       margin-bottom: 12px;
     }
 
-    #cities .cities-sub {
-      font-size: 1rem;
-      color: var(--cold-white);
-      opacity: .65;
-      margin-bottom: 56px;
+    .cities-sub {
+      font-size: .95rem;
+      color: var(--white);
+      opacity: .55;
+      margin-bottom: 52px;
     }
 
     .cities-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      max-width: 700px;
+      gap: 20px;
+      max-width: 640px;
       margin: 0 auto 48px;
     }
 
     .city-card {
-      border: 1px solid rgba(97,113,255,.25);
-      border-radius: 8px;
-      padding: 40px 36px;
-      background: rgba(97,113,255,.05);
+      border: 1px solid rgba(97,113,255,.2);
+      border-radius: 10px;
+      padding: 44px 36px;
+      background: rgba(97,113,255,.04);
       position: relative;
       overflow: hidden;
+      transition: border-color .2s, background .2s;
+    }
+
+    .city-card:hover {
+      border-color: rgba(97,113,255,.4);
+      background: rgba(97,113,255,.08);
     }
 
     .city-card::before {
@@ -312,185 +373,232 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       height: 2px;
-      background: linear-gradient(90deg, var(--royal-blue), var(--vibrant-blue));
+      background: linear-gradient(90deg, var(--royal), var(--blue));
     }
 
     .city-name {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 800;
-      color: var(--cold-white);
+      color: var(--white);
       margin-bottom: 6px;
     }
 
     .city-state {
-      font-size: .88rem;
-      font-weight: 500;
-      color: var(--vibrant-blue);
-      letter-spacing: .06em;
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: .12em;
       text-transform: uppercase;
     }
-
-    #cities .btn-primary { margin: 0 auto; }
 
     /* ════════════════════════════════
        FORM
     ════════════════════════════════ */
     #form {
-      background: var(--cold-white);
-      padding: 100px 80px;
+      background: var(--white);
+      padding: 100px 0;
+    }
+
+    #form .container {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 80px;
       align-items: start;
     }
 
+    .form-intro .label {
+      color: var(--royal);
+      margin-bottom: 24px;
+      display: block;
+    }
+
     .form-intro h2 {
-      font-size: clamp(1.5rem, 2.2vw, 2rem);
+      font-size: clamp(1.5rem, 2.2vw, 2.1rem);
       font-weight: 800;
-      color: var(--dark-blue);
+      color: var(--dark);
       line-height: 1.25;
       margin-bottom: 20px;
     }
 
     .form-intro p {
-      font-size: 1rem;
+      font-size: .95rem;
       font-weight: 500;
-      line-height: 1.7;
-      color: var(--dark-blue);
-      opacity: .75;
+      line-height: 1.75;
+      color: var(--dark);
+      opacity: .65;
     }
 
     .form-wrap {
       background: #fff;
-      border-radius: 12px;
-      padding: 40px;
-      box-shadow: 0 4px 40px rgba(0,0,0,.08);
-    }
-
-    /* RD Station form overrides */
-    .form-wrap input,
-    .form-wrap select {
-      font-family: 'DM Sans', sans-serif !important;
+      border-radius: 14px;
+      padding: 44px;
+      box-shadow: 0 2px 60px rgba(9,9,14,.1);
+      border: 1px solid rgba(0,0,0,.06);
     }
 
     /* ════════════════════════════════
        ABOUT
     ════════════════════════════════ */
     #about {
-      background: var(--dark-blue);
-      padding: 100px 80px;
+      background: var(--dark);
+      padding: 100px 0;
       position: relative;
       overflow: hidden;
     }
 
-    #about::after {
+    /* deep radial behind right image */
+    #about::before {
       content: '';
       position: absolute;
-      right: -120px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 500px;
-      height: 500px;
-      background: url('heptagono.png') center/contain no-repeat;
-      opacity: .07;
+      right: 0; top: 0; bottom: 0;
+      width: 55%;
+      background: radial-gradient(ellipse at right center, rgba(17,37,124,.4) 0%, transparent 70%);
       pointer-events: none;
     }
 
-    .about-inner {
-      max-width: 680px;
+    #about .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
       position: relative;
       z-index: 2;
     }
 
-    .about-badge {
-      display: inline-block;
-      font-size: .75rem;
-      font-weight: 700;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--vibrant-blue);
-      border: 1px solid rgba(97,113,255,.3);
-      padding: 6px 14px;
-      border-radius: 100px;
-      margin-bottom: 32px;
-    }
+    .about-content .label { margin-bottom: 28px; display: block; }
 
-    #about h2 {
-      font-size: clamp(1.5rem, 2.2vw, 2rem);
+    .about-content h2 {
+      font-size: clamp(1.5rem, 2.2vw, 2.1rem);
       font-weight: 800;
-      color: var(--cold-white);
-      margin-bottom: 28px;
+      color: var(--white);
       line-height: 1.25;
+      margin-bottom: 24px;
     }
 
-    #about h2 span { color: var(--vibrant-blue); }
+    .about-content h2 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--blue), var(--baby));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-    #about p {
-      font-size: 1rem;
+    .about-content p {
+      font-size: .98rem;
       font-weight: 500;
-      line-height: 1.75;
-      color: var(--cold-white);
-      opacity: .8;
-      margin-bottom: 20px;
+      line-height: 1.8;
+      color: var(--white);
+      opacity: .75;
+      margin-bottom: 18px;
     }
 
     .revenue-method {
-      margin: 40px 0;
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
+      gap: 6px;
+      margin: 32px 0;
     }
 
     .method-pill {
-      background: rgba(97,113,255,.1);
-      border: 1px solid rgba(97,113,255,.2);
+      background: rgba(97,113,255,.08);
+      border: 1px solid rgba(97,113,255,.18);
       border-radius: 6px;
-      padding: 10px 6px;
+      padding: 12px 4px;
       text-align: center;
     }
 
     .method-letter {
       display: block;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 800;
-      color: var(--vibrant-blue);
+      color: var(--blue);
       line-height: 1;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
 
     .method-word {
       display: block;
-      font-size: .62rem;
-      font-weight: 500;
-      color: var(--cold-white);
-      opacity: .65;
-      letter-spacing: .02em;
+      font-size: .58rem;
+      font-weight: 600;
+      color: var(--white);
+      opacity: .55;
       text-transform: uppercase;
+      letter-spacing: .03em;
       line-height: 1.3;
     }
 
-    .about-signatures {
-      margin-top: 44px;
+    /* Dealwise logo inside about */
+    .dealwise-logo-wrap {
       display: flex;
-      gap: 40px;
+      align-items: center;
+      gap: 14px;
+      margin: 28px 0;
+      padding: 18px 0;
+      border-top: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
 
-    .signature {
+    .dealwise-logo-wrap img {
+      height: 28px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      opacity: .7;
+    }
+
+    .dealwise-by {
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--white);
+      opacity: .4;
+    }
+
+    .about-signatures {
       display: flex;
-      flex-direction: column;
-      gap: 2px;
+      gap: 36px;
+      margin-top: 8px;
     }
 
     .sig-name {
-      font-size: 1rem;
+      display: block;
+      font-size: .95rem;
       font-weight: 700;
-      color: var(--cold-white);
+      color: var(--white);
     }
 
     .sig-role {
-      font-size: .82rem;
+      display: block;
+      font-size: .78rem;
       font-weight: 500;
-      color: var(--vibrant-blue);
+      color: var(--blue);
+      margin-top: 2px;
+    }
+
+    /* founders photo */
+    .about-image {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .about-image::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center bottom, rgba(97,113,255,.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .founders-img {
+      width: 100%;
+      max-width: 480px;
+      height: auto;
+      display: block;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 20px 60px rgba(97,113,255,.15));
     }
 
     /* ════════════════════════════════
@@ -498,11 +606,14 @@
     ════════════════════════════════ */
     footer {
       background: #05050a;
-      padding: 40px 80px;
+      padding: 44px 0;
+      border-top: 1px solid rgba(255,255,255,.05);
+    }
+
+    footer .container {
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      border-top: 1px solid rgba(255,255,255,.05);
+      gap: 20px;
     }
 
     .footer-top {
@@ -511,65 +622,51 @@
       align-items: center;
     }
 
-    .footer-logo { height: 32px; width: auto; }
+    .footer-logo { height: 34px; width: auto; }
 
-    .footer-brand {
-      font-size: .8rem;
+    .footer-copy {
+      font-size: .78rem;
       font-weight: 500;
-      color: var(--cold-white);
-      opacity: .4;
+      color: var(--white);
+      opacity: .3;
     }
 
     .footer-disclaimer {
-      font-size: .72rem;
-      font-weight: 400;
-      line-height: 1.6;
-      color: var(--cold-white);
-      opacity: .35;
-      max-width: 760px;
+      font-size: .7rem;
+      line-height: 1.65;
+      color: var(--white);
+      opacity: .28;
+      max-width: 800px;
     }
 
     /* ════════════════════════════════
        RESPONSIVE
     ════════════════════════════════ */
     @media (max-width: 1024px) {
-      #hero { grid-template-columns: 1fr; min-height: auto; }
-      .hero-content { padding: 80px 40px 40px; }
-      .hero-heptagono { display: none; }
-      .hero-image-wrap {
-        height: 50vw;
-        max-height: 420px;
-        justify-content: center;
-      }
-      .hero-founders { height: 100%; }
-      .badge-wrap { bottom: 20px; right: 20px; width: 70px; height: 70px; }
-
+      .container { padding: 0 40px; }
+      #context .container { padding: 0 40px; }
+      .hero-nav { padding: 32px 40px; }
+      .hero-body { padding: 40px 40px 100px; }
       .numbers-grid { grid-template-columns: repeat(3, 1fr); }
-      #context { grid-template-columns: 1fr; gap: 40px; padding: 64px 40px; }
-      .context-visual { display: none; }
-      #cities { padding: 64px 40px; }
-      .cities-grid { grid-template-columns: 1fr 1fr; }
-      #form { grid-template-columns: 1fr; gap: 40px; padding: 64px 40px; }
-      #about { padding: 64px 40px; }
-      .revenue-method { grid-template-columns: repeat(4, 1fr); }
-      #numbers { padding: 64px 40px; }
-      footer { padding: 32px 40px; }
+      #about .container { grid-template-columns: 1fr; gap: 48px; }
+      .about-image { max-height: 400px; overflow: hidden; }
+      .founders-img { max-width: 100%; max-height: 380px; object-fit: contain; object-position: bottom; }
+      #form .container { grid-template-columns: 1fr; gap: 40px; }
+      footer .container { padding: 0 40px; }
     }
 
-    @media (max-width: 600px) {
-      .hero-content { padding: 64px 24px 32px; }
+    @media (max-width: 640px) {
+      .container { padding: 0 24px; }
+      #context .container { padding: 0 24px; }
+      .hero-nav { padding: 28px 24px; }
+      .hero-body { padding: 32px 24px 80px; }
       .numbers-grid { grid-template-columns: repeat(2, 1fr); }
       .cities-grid { grid-template-columns: 1fr; }
-      #form { padding: 64px 24px; }
-      .form-wrap { padding: 28px 20px; }
-      #about { padding: 64px 24px; }
       .revenue-method { grid-template-columns: repeat(4, 1fr); }
-      .about-signatures { flex-direction: column; gap: 20px; }
-      footer { padding: 32px 24px; }
-      .footer-top { flex-direction: column; gap: 12px; align-items: flex-start; }
-      #numbers { padding: 64px 24px; }
-      #cities { padding: 64px 24px; }
-      #context { padding: 64px 24px; }
+      .about-signatures { flex-direction: column; gap: 18px; }
+      .form-wrap { padding: 28px 20px; }
+      footer .container { padding: 0 24px; }
+      .footer-top { flex-direction: column; align-items: flex-start; gap: 12px; }
     }
   </style>
 </head>
@@ -580,42 +677,30 @@
        SESSÃO 1 — HERO
   ═══════════════════════════════════════ -->
   <section id="hero">
+    <canvas id="beams-canvas"></canvas>
+    <div class="noise"></div>
 
-    <img class="hero-heptagono" src="heptagono.png" alt="" aria-hidden="true">
+    <nav class="hero-nav">
+      <img src="logo-revenue-lab.svg" alt="Revenue Lab by Dealwise">
+    </nav>
 
-    <div class="hero-content">
-      <img class="hero-logo" src="logo-revenue-lab.svg" alt="Revenue Lab by Dealwise">
+    <div class="hero-body">
+      <div class="hero-badge">
+        <span></span>
+        Imersão Presencial · 3 Dias
+      </div>
 
       <h1 class="hero-headline">
-        Crescimento previsível não é meta. É consequência de uma operação que você controla.
+        Crescimento previsível não é meta.<br>
+        É <em>consequência</em> de uma operação<br>que você controla.
       </h1>
 
       <p class="hero-sub">
         Quando você conhece suas alavancas, sabe exatamente onde ajustar para crescer. Quando não conhece, o resultado do mês é sempre uma surpresa. O Revenue Lab é onde você aprende a ler e controlar sua operação de receitas para que o crescimento pare de depender da sorte.
       </p>
 
-      <a class="btn-primary" href="#form">Quero garantir meu lugar na lista</a>
+      <a class="btn" href="#form">Quero garantir meu lugar na lista</a>
     </div>
-
-    <div class="hero-image-wrap">
-      <img class="hero-founders" src="baesso-e-gabriel.png" alt="Vítor Baesso e Gabriel Machado">
-
-      <!-- Circular Dealwise badge -->
-      <div class="badge-wrap" aria-hidden="true">
-        <svg viewBox="0 0 90 90" width="90" height="90">
-          <defs>
-            <path id="circle-path" d="M 45,45 m -32,0 a 32,32 0 1,1 64,0 a 32,32 0 1,1 -64,0"/>
-          </defs>
-          <circle cx="45" cy="45" r="44" fill="none" stroke="rgba(97,113,255,.25)" stroke-width="1"/>
-          <circle cx="45" cy="45" r="36" fill="rgba(9,9,14,.85)"/>
-          <!-- inner D logo mark placeholder -->
-          <text font-family="DM Sans, sans-serif" font-size="7" font-weight="700" fill="#f2f2f2" letter-spacing="3.2">
-            <textPath href="#circle-path">DEALWISE · DEALWISE · DEALWISE ·</textPath>
-          </text>
-        </svg>
-      </div>
-    </div>
-
   </section>
 
 
@@ -623,27 +708,29 @@
        SESSÃO 2 — NÚMEROS
   ═══════════════════════════════════════ -->
   <section id="numbers">
-    <p class="section-label">O que muda quando uma empresa estrutura sua operação de receitas</p>
-    <div class="numbers-grid">
-      <div class="number-card">
-        <span class="number-big">+160%</span>
-        <span class="number-desc">de crescimento médio em 12 meses</span>
-      </div>
-      <div class="number-card">
-        <span class="number-big">3×</span>
-        <span class="number-desc">mais oportunidades qualificadas geradas por mês</span>
-      </div>
-      <div class="number-card">
-        <span class="number-big">62%</span>
-        <span class="number-desc">do faturamento vindo de vendas ativas, sem depender de indicação</span>
-      </div>
-      <div class="number-card">
-        <span class="number-big">5 meses</span>
-        <span class="number-desc">para atingir ou extrapolar a meta anual inteira</span>
-      </div>
-      <div class="number-card">
-        <span class="number-big">R$&nbsp;5M</span>
-        <span class="number-desc">em nova receita gerada em projetos de apenas 5 meses</span>
+    <div class="container">
+      <span class="label">O que muda quando uma empresa estrutura sua operação de receitas</span>
+      <div class="numbers-grid">
+        <div class="number-card">
+          <span class="number-big">+160%</span>
+          <span class="number-desc">de crescimento médio em 12 meses</span>
+        </div>
+        <div class="number-card">
+          <span class="number-big">3×</span>
+          <span class="number-desc">mais oportunidades qualificadas geradas por mês</span>
+        </div>
+        <div class="number-card">
+          <span class="number-big">62%</span>
+          <span class="number-desc">do faturamento vindo de vendas ativas, sem depender de indicação</span>
+        </div>
+        <div class="number-card">
+          <span class="number-big">5 meses</span>
+          <span class="number-desc">para atingir ou extrapolar a meta anual inteira</span>
+        </div>
+        <div class="number-card">
+          <span class="number-big">R$&nbsp;5M</span>
+          <span class="number-desc">em nova receita gerada em projetos de apenas 5 meses</span>
+        </div>
       </div>
     </div>
   </section>
@@ -653,8 +740,9 @@
        SESSÃO 3 — CONTEXTO
   ═══════════════════════════════════════ -->
   <section id="context">
-    <div class="context-text">
-      <h2>A maioria das PMEs B2B cresce<br><span>por acidente.</span></h2>
+    <div class="container">
+      <span class="label">Por que o Revenue Lab existe</span>
+      <h2>A maioria das PMEs B2B<br>cresce <em>por acidente.</em></h2>
       <p>
         Indicação aqui, vendedor bom ali, founder que não para de prospectar. Funciona por um tempo. Mas quando o dono tira o pé, o número cai. Quando o vendedor sai, o funil esvazia. Quando o mês fecha no vermelho, ninguém sabe exatamente por quê.
       </p>
@@ -665,9 +753,6 @@
         O Revenue Lab existe para mudar isso. Em 3 dias presenciais, você vai entender as alavancas do seu negócio, estruturar sua operação de receitas e sair com clareza do que implementar na semana seguinte.
       </p>
     </div>
-    <div class="context-visual">
-      <img class="context-heptagono" src="heptagono.png" alt="" aria-hidden="true">
-    </div>
   </section>
 
 
@@ -675,21 +760,24 @@
        SESSÃO 4 — CIDADES
   ═══════════════════════════════════════ -->
   <section id="cities">
-    <h2>Duas cidades. Uma metodologia.</h2>
-    <p class="cities-sub">As datas e o local serão informados para quem estiver na lista de espera.</p>
+    <div class="container">
+      <span class="label">Edições 2026</span>
+      <h2>Duas cidades. Uma metodologia.</h2>
+      <p class="cities-sub">As datas e o local serão informados para quem estiver na lista de espera.</p>
 
-    <div class="cities-grid">
-      <div class="city-card">
-        <p class="city-name">Juiz de Fora</p>
-        <p class="city-state">Minas Gerais</p>
+      <div class="cities-grid">
+        <div class="city-card">
+          <p class="city-name">Juiz de Fora</p>
+          <p class="city-state">Minas Gerais</p>
+        </div>
+        <div class="city-card">
+          <p class="city-name">São Paulo</p>
+          <p class="city-state">São Paulo</p>
+        </div>
       </div>
-      <div class="city-card">
-        <p class="city-name">São Paulo</p>
-        <p class="city-state">São Paulo</p>
-      </div>
+
+      <a class="btn" href="#form">Quero ser avisado primeiro</a>
     </div>
-
-    <a class="btn-primary" href="#form">Quero ser avisado primeiro</a>
   </section>
 
 
@@ -697,18 +785,21 @@
        SESSÃO 5 — FORMULÁRIO
   ═══════════════════════════════════════ -->
   <section id="form">
-    <div class="form-intro">
-      <h2>Demonstre interesse e receba todas as informações em primeira mão.</h2>
-      <p>
-        Preencha o formulário ao lado. Nosso time entrará em contato com os detalhes da edição mais próxima de você, incluindo datas, local e condições especiais para quem demonstrou interesse antes do lançamento oficial.
-      </p>
-    </div>
-    <div class="form-wrap">
-      <div role="main" id="lp-dealwise-formulario-revenue-lab-18265f3363dea0c00e6b"></div>
-      <script type="text/javascript" src="https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js"></script>
-      <script type="text/javascript">
-        new RDStationForms('lp-dealwise-formulario-revenue-lab-18265f3363dea0c00e6b', 'UA-163096591-1').createForm();
-      </script>
+    <div class="container">
+      <div class="form-intro">
+        <span class="label">Lista de espera</span>
+        <h2>Demonstre interesse e receba todas as informações em primeira mão.</h2>
+        <p>
+          Preencha o formulário ao lado. Nosso time entra em contato com os detalhes da edição mais próxima de você — datas, local e condições especiais para quem demonstrou interesse antes do lançamento oficial.
+        </p>
+      </div>
+      <div class="form-wrap">
+        <div role="main" id="lp-dealwise-formulario-revenue-lab-18265f3363dea0c00e6b"></div>
+        <script type="text/javascript" src="https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js"></script>
+        <script type="text/javascript">
+          new RDStationForms('lp-dealwise-formulario-revenue-lab-18265f3363dea0c00e6b', 'UA-163096591-1').createForm();
+        </script>
+      </div>
     </div>
   </section>
 
@@ -717,64 +808,52 @@
        SESSÃO 6 — SOBRE A DEALWISE
   ═══════════════════════════════════════ -->
   <section id="about">
-    <div class="about-inner">
-      <span class="about-badge">Revenue Builder</span>
+    <div class="container">
 
-      <h2>Quem está por trás<br>do <span>Revenue Lab</span></h2>
+      <div class="about-content">
+        <span class="label">Quem está por trás</span>
 
-      <p>
-        A Dealwise é a primeira Revenue Builder do Brasil. Não somos uma consultoria que ensina o que nunca fez. Crescemos para mais de R$ 10M de faturamento anual a partir de Juiz de Fora, sem investidor externo e sem depender de indicação — usando o mesmo método que ensinamos.
-      </p>
+        <h2>A primeira <em>Revenue Builder</em><br>do Brasil.</h2>
 
-      <p>
-        Esse método se chama REVENUE. São 7 pilares que estruturam toda a operação de receitas de uma empresa. Cada pilar é interdependente. Quando todos funcionam juntos, o crescimento para de ser acidente e vira consequência.
-      </p>
+        <p>
+          Não somos uma consultoria que ensina o que nunca fez. Crescemos para mais de R$ 10M de faturamento anual a partir de Juiz de Fora, sem investidor externo e sem depender de indicação — usando o mesmo método que ensinamos.
+        </p>
 
-      <div class="revenue-method" aria-label="Método REVENUE">
-        <div class="method-pill">
-          <span class="method-letter">R</span>
-          <span class="method-word">Resultado</span>
+        <p>
+          Esse método se chama REVENUE. São 7 pilares que estruturam toda a operação de receitas de uma empresa. Cada pilar é interdependente. Quando todos funcionam juntos, o crescimento para de ser acidente e vira consequência.
+        </p>
+
+        <div class="revenue-method" aria-label="Método REVENUE">
+          <div class="method-pill"><span class="method-letter">R</span><span class="method-word">Resultado</span></div>
+          <div class="method-pill"><span class="method-letter">E</span><span class="method-word">Estratégia</span></div>
+          <div class="method-pill"><span class="method-letter">V</span><span class="method-word">Velocidade</span></div>
+          <div class="method-pill"><span class="method-letter">E</span><span class="method-word">Execução</span></div>
+          <div class="method-pill"><span class="method-letter">N</span><span class="method-word">Network</span></div>
+          <div class="method-pill"><span class="method-letter">U</span><span class="method-word">Usuário</span></div>
+          <div class="method-pill"><span class="method-letter">E</span><span class="method-word">Engenharia</span></div>
         </div>
-        <div class="method-pill">
-          <span class="method-letter">E</span>
-          <span class="method-word">Estratégia</span>
+
+        <div class="dealwise-logo-wrap">
+          <span class="dealwise-by">Revenue Builder</span>
+          <img src="logo-dealwise.svg" alt="Dealwise">
         </div>
-        <div class="method-pill">
-          <span class="method-letter">V</span>
-          <span class="method-word">Velocidade</span>
-        </div>
-        <div class="method-pill">
-          <span class="method-letter">E</span>
-          <span class="method-word">Execução</span>
-        </div>
-        <div class="method-pill">
-          <span class="method-letter">N</span>
-          <span class="method-word">Network</span>
-        </div>
-        <div class="method-pill">
-          <span class="method-letter">U</span>
-          <span class="method-word">Usuário</span>
-        </div>
-        <div class="method-pill">
-          <span class="method-letter">E</span>
-          <span class="method-word">Engenharia</span>
+
+        <div class="about-signatures">
+          <div>
+            <span class="sig-name">Vítor Baesso</span>
+            <span class="sig-role">Co-CEO, Dealwise</span>
+          </div>
+          <div>
+            <span class="sig-name">Gabriel Machado</span>
+            <span class="sig-role">Co-CEO, Dealwise</span>
+          </div>
         </div>
       </div>
 
-      <p>
-        O Revenue Lab é onde você implementa esse sistema na sua empresa, na prática, em 3 dias.
-      </p>
-
-      <div class="about-signatures">
-        <div class="signature">
-          <span class="sig-name">Vítor Baesso</span>
-          <span class="sig-role">Co-CEO, Dealwise</span>
-        </div>
-        <div class="signature">
-          <span class="sig-name">Gabriel Machado</span>
-          <span class="sig-role">Co-CEO, Dealwise</span>
-        </div>
+      <div class="about-image">
+        <img class="founders-img" src="baesso-e-gabriel.png" alt="Vítor Baesso e Gabriel Machado">
       </div>
+
     </div>
   </section>
 
@@ -783,14 +862,97 @@
        FOOTER
   ═══════════════════════════════════════ -->
   <footer>
-    <div class="footer-top">
-      <img class="footer-logo" src="logo-revenue-lab.svg" alt="Revenue Lab by Dealwise">
-      <span class="footer-brand">Dealwise Revenue Builder · © 2026 — Todos os direitos reservados</span>
+    <div class="container">
+      <div class="footer-top">
+        <img class="footer-logo" src="logo-revenue-lab.svg" alt="Revenue Lab by Dealwise">
+        <span class="footer-copy">Dealwise Revenue Builder · © 2026 — Todos os direitos reservados</span>
+      </div>
+      <p class="footer-disclaimer">
+        Os números apresentados nesta página são resultados reais de clientes Dealwise e não configuram promessa ou garantia de resultado. Resultados individuais podem variar de acordo com o contexto, segmento e execução de cada empresa.
+      </p>
     </div>
-    <p class="footer-disclaimer">
-      Os números apresentados nesta página são resultados reais de clientes Dealwise e não configuram promessa ou garantia de resultado. Resultados individuais podem variar de acordo com o contexto, segmento e execução de cada empresa.
-    </p>
   </footer>
+
+
+  <!-- ═══════════════════════════════════════
+       CANVAS BEAMS
+  ═══════════════════════════════════════ -->
+  <script>
+    (function () {
+      const canvas = document.getElementById('beams-canvas');
+      const ctx    = canvas.getContext('2d');
+      const BEAM_COUNT = 10;
+
+      function rand(min, max) { return Math.random() * (max - min) + min; }
+
+      function resize() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function createBeam(index) {
+        const col     = index % 3;
+        const spacing = canvas.width / 3;
+        return {
+          x:          col * spacing + spacing / 2 + rand(-spacing * .4, spacing * .4),
+          y:          rand(canvas.height * .2, canvas.height * 1.2),
+          width:      rand(60, 150),
+          length:     canvas.height * 2.8,
+          angle:      rand(-38, -26),
+          speed:      rand(0.35, 0.9),
+          opacity:    rand(0.06, 0.15),
+          hue:        220 + (index * 30 / BEAM_COUNT) + rand(-10, 10),
+          pulse:      rand(0, Math.PI * 2),
+          pulseSpeed: rand(0.012, 0.03),
+        };
+      }
+
+      let beams = [];
+
+      function initBeams() {
+        beams = Array.from({ length: BEAM_COUNT }, (_, i) => createBeam(i));
+      }
+
+      function drawBeam(b) {
+        const op = b.opacity * (0.85 + 0.15 * Math.sin(b.pulse));
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(b.angle * Math.PI / 180);
+        const g = ctx.createLinearGradient(0, 0, 0, b.length);
+        g.addColorStop(0,    `hsla(${b.hue},78%,62%,0)`);
+        g.addColorStop(0.2,  `hsla(${b.hue},78%,62%,${op})`);
+        g.addColorStop(0.75, `hsla(${b.hue},78%,62%,${op * .55})`);
+        g.addColorStop(1,    `hsla(${b.hue},78%,62%,0)`);
+        ctx.fillStyle = g;
+        ctx.filter    = 'blur(38px)';
+        ctx.fillRect(-b.width / 2, 0, b.width, b.length);
+        ctx.restore();
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        beams.forEach((b, i) => {
+          b.y     -= b.speed;
+          b.pulse += b.pulseSpeed;
+          if (b.y + b.length < 0) {
+            const col     = i % 3;
+            const spacing = canvas.width / 3;
+            b.x       = col * spacing + spacing / 2 + rand(-spacing * .4, spacing * .4);
+            b.y       = canvas.height + rand(0, canvas.height * .3);
+            b.width   = rand(60, 150);
+            b.opacity = rand(0.06, 0.15);
+          }
+          drawBeam(b);
+        });
+        requestAnimationFrame(animate);
+      }
+
+      window.addEventListener('resize', () => { resize(); initBeams(); });
+      resize();
+      initBeams();
+      animate();
+    })();
+  </script>
 
 </body>
 </html>
