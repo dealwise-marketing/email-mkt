@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Revenue Lab by Dealwise — Imersão presencial de 3 dias em operação de receitas para CEOs e diretores de PMEs B2B.">
+  <title>Revenue Lab by Dealwise — Pré-Inscrição</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --dark-blue:    #09090e;
+      --deep-blue:    #1b2344;
+      --royal-blue:   #11257c;
+      --vibrant-blue: #6171ff;
+      --baby-blue:    #959fff;
+      --cold-white:   #f2f2f2;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark-blue);
+      color: var(--cold-white);
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: .35;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    /* ════════════════════════════════
+       HERO
+    ════════════════════════════════ */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      overflow: hidden;
+      background: var(--dark-blue);
+    }
+
+    /* diagonal stripe texture */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        -52deg,
+        transparent 0px,
+        transparent 28px,
+        rgba(97,113,255,.035) 28px,
+        rgba(97,113,255,.035) 29px
+      );
+      pointer-events: none;
+    }
+
+    /* heptagon background */
+    .hero-heptagono {
+      position: absolute;
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 720px;
+      height: 720px;
+      object-fit: contain;
+      opacity: .18;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* left content */
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 100px 64px 80px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .hero-logo {
+      height: 52px;
+      width: auto;
+    }
+
+    .hero-headline {
+      font-size: clamp(2rem, 3.4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--vibrant-blue);
+      max-width: 520px;
+    }
+
+    .hero-sub {
+      font-size: clamp(.95rem, 1.1vw, 1.1rem);
+      font-weight: 500;
+      line-height: 1.65;
+      color: var(--cold-white);
+      max-width: 480px;
+      opacity: .88;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--vibrant-blue);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      align-self: flex-start;
+      letter-spacing: .01em;
+    }
+    .btn-primary:hover { background: var(--baby-blue); transform: translateY(-1px); }
+
+    /* right image area */
+    .hero-image-wrap {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .hero-founders {
+      position: relative;
+      z-index: 2;
+      height: 95vh;
+      max-height: 820px;
+      width: auto;
+      object-fit: contain;
+      object-position: bottom;
+      display: block;
+    }
+
+    /* Circular Dealwise badge */
+    .badge-wrap {
+      position: absolute;
+      bottom: 48px;
+      right: 48px;
+      z-index: 3;
+      width: 90px;
+      height: 90px;
+    }
+    .badge-wrap svg { animation: spin 14s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ════════════════════════════════
+       NUMBERS
+    ════════════════════════════════ */
+    #numbers {
+      background: var(--deep-blue);
+      padding: 88px 80px;
+    }
+
+    .section-label {
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--vibrant-blue);
+      margin-bottom: 48px;
+      opacity: .9;
+    }
+
+    .numbers-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2px;
+    }
+
+    .number-card {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(97,113,255,.12);
+      padding: 36px 28px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .number-big {
+      font-size: clamp(2rem, 2.8vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--vibrant-blue), var(--baby-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .number-desc {
+      font-size: .88rem;
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--cold-white);
+      opacity: .75;
+    }
+
+    /* ════════════════════════════════
+       CONTEXT
+    ════════════════════════════════ */
+    #context {
+      background: var(--dark-blue);
+      padding: 100px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .context-text h2 {
+      font-size: clamp(1.5rem, 2.2vw, 2rem);
+      font-weight: 800;
+      line-height: 1.25;
+      color: var(--cold-white);
+      margin-bottom: 28px;
+    }
+
+    .context-text h2 span {
+      color: var(--vibrant-blue);
+    }
+
+    .context-text p {
+      font-size: 1rem;
+      font-weight: 500;
+      line-height: 1.75;
+      color: var(--cold-white);
+      opacity: .8;
+      margin-bottom: 20px;
+    }
+
+    .context-text p:last-child { margin-bottom: 0; }
+
+    .context-visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .context-heptagono {
+      width: 100%;
+      max-width: 380px;
+      opacity: .55;
+    }
+
+    /* ════════════════════════════════
+       CITIES
+    ════════════════════════════════ */
+    #cities {
+      background: var(--deep-blue);
+      padding: 88px 80px;
+      text-align: center;
+    }
+
+    #cities h2 {
+      font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+      font-weight: 800;
+      color: var(--cold-white);
+      margin-bottom: 12px;
+    }
+
+    #cities .cities-sub {
+      font-size: 1rem;
+      color: var(--cold-white);
+      opacity: .65;
+      margin-bottom: 56px;
+    }
+
+    .cities-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 700px;
+      margin: 0 auto 48px;
+    }
+
+    .city-card {
+      border: 1px solid rgba(97,113,255,.25);
+      border-radius: 8px;
+      padding: 40px 36px;
+      background: rgba(97,113,255,.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .city-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--royal-blue), var(--vibrant-blue));
+    }
+
+    .city-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--cold-white);
+      margin-bottom: 6px;
+    }
+
+    .city-state {
+      font-size: .88rem;
+      font-weight: 500;
+      color: var(--vibrant-blue);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    #cities .btn-primary { margin: 0 auto; }
+
+    /* ════════════════════════════════
+       FORM
+    ════════════════════════════════ */
+    #form {
+      background: var(--cold-white);
+      padding: 100px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .form-intro h2 {
+      font-size: clamp(1.5rem, 2.2vw, 2rem);
+      font-weight: 800;
+      color: var(--dark-blue);
+      line-height: 1.25;
+      margin-bottom: 20px;
+    }
+
+    .form-intro p {
+      font-size: 1rem;
+      font-weight: 500;
+      line-height: 1.7;
+      color: var(--dark-blue);
+      opacity: .75;
+    }
+
+    .form-wrap {
+      background: #fff;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 4px 40px rgba(0,0,0,.08);
+    }
+
+    /* RD Station form overrides */
+    .form-wrap input,
+    .form-wrap select {
+      font-family: 'DM Sans', sans-serif !important;
+    }
+
+    /* ════════════════════════════════
+       ABOUT
+    ════════════════════════════════ */
+    #about {
+      background: var(--dark-blue);
+      padding: 100px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #about::after {
+      content: '';
+      position: absolute;
+      right: -120px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 500px;
+      height: 500px;
+      background: url('heptagono.png') center/contain no-repeat;
+      opacity: .07;
+      pointer-events: none;
+    }
+
+    .about-inner {
+      max-width: 680px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .about-badge {
+      display: inline-block;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--vibrant-blue);
+      border: 1px solid rgba(97,113,255,.3);
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+
+    #about h2 {
+      font-size: clamp(1.5rem, 2.2vw, 2rem);
+      font-weight: 800;
+      color: var(--cold-white);
+      margin-bottom: 28px;
+      line-height: 1.25;
+    }
+
+    #about h2 span { color: var(--vibrant-blue); }
+
+    #about p {
+      font-size: 1rem;
+      font-weight: 500;
+      line-height: 1.75;
+      color: var(--cold-white);
+      opacity: .8;
+      margin-bottom: 20px;
+    }
+
+    .revenue-method {
+      margin: 40px 0;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .method-pill {
+      background: rgba(97,113,255,.1);
+      border: 1px solid rgba(97,113,255,.2);
+      border-radius: 6px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+
+    .method-letter {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--vibrant-blue);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .method-word {
+      display: block;
+      font-size: .62rem;
+      font-weight: 500;
+      color: var(--cold-white);
+      opacity: .65;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      line-height: 1.3;
+    }
+
+    .about-signatures {
+      margin-top: 44px;
+      display: flex;
+      gap: 40px;
+    }
+
+    .signature {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sig-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--cold-white);
+    }
+
+    .sig-role {
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--vibrant-blue);
+    }
+
+    /* ════════════════════════════════
+       FOOTER
+    ════════════════════════════════ */
+    footer {
+      background: #05050a;
+      padding: 40px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-top: 1px solid rgba(255,255,255,.05);
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-logo { height: 32px; width: auto; }
+
+    .footer-brand {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--cold-white);
+      opacity: .4;
+    }
+
+    .footer-disclaimer {
+      font-size: .72rem;
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--cold-white);
+      opacity: .35;
+      max-width: 760px;
+    }
+
+    /* ════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════ */
+    @media (max-width: 1024px) {
+      #hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-content { padding: 80px 40px 40px; }
+      .hero-heptagono { display: none; }
+      .hero-image-wrap {
+        height: 50vw;
+        max-height: 420px;
+        justify-content: center;
+      }
+      .hero-founders { height: 100%; }
+      .badge-wrap { bottom: 20px; right: 20px; width: 70px; height: 70px; }
+
+      .numbers-grid { grid-template-columns: repeat(3, 1fr); }
+      #context { grid-template-columns: 1fr; gap: 40px; padding: 64px 40px; }
+      .context-visual { display: none; }
+      #cities { padding: 64px 40px; }
+      .cities-grid { grid-template-columns: 1fr 1fr; }
+      #form { grid-template-columns: 1fr; gap: 40px; padding: 64px 40px; }
+      #about { padding: 64px 40px; }
+      .revenue-method { grid-template-columns: repeat(4, 1fr); }
+      #numbers { padding: 64px 40px; }
+      footer { padding: 32px 40px; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-content { padding: 64px 24px 32px; }
+      .numbers-grid { grid-template-columns: repeat(2, 1fr); }
+      .cities-grid { grid-template-columns: 1fr; }
+      #form { padding: 64px 24px; }
+      .form-wrap { padding: 28px 20px; }
+      #about { padding: 64px 24px; }
+      .revenue-method { grid-template-columns: repeat(4, 1fr); }
+      .about-signatures { flex-direction: column; gap: 20px; }
+      footer { padding: 32px 24px; }
+      .footer-top { flex-direction: column; gap: 12px; align-items: flex-start; }
+      #numbers { padding: 64px 24px; }
+      #cities { padding: 64px 24px; }
+      #context { padding: 64px 24px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════
+       SESSÃO 1 — HERO
+  ═══════════════════════════════════════ -->
+  <section id="hero">
+
+    <img class="hero-heptagono" src="heptagono.png" alt="" aria-hidden="true">
+
+    <div class="hero-content">
+      <img class="hero-logo" src="logo-revenue-lab.svg" alt="Revenue Lab by Dealwise">
+
+      <h1 class="hero-headline">
+        Crescimento previsível não é meta. É consequência de uma operação que você controla.
+      </h1>
+
+      <p class="hero-sub">
+        Quando você conhece suas alavancas, sabe exatamente onde ajustar para crescer. Quando não conhece, o resultado do mês é sempre uma surpresa. O Revenue Lab é onde você aprende a ler e controlar sua operação de receitas para que o crescimento pare de depender da sorte.
+      </p>
+
+      <a class="btn-primary" href="#form">Quero garantir meu lugar na lista</a>
+    </div>
+
+    <div class="hero-image-wrap">
+      <img class="hero-founders" src="baesso-e-gabriel.png" alt="Vítor Baesso e Gabriel Machado">
+
+      <!-- Circular Dealwise badge -->
+      <div class="badge-wrap" aria-hidden="true">
+        <svg viewBox="0 0 90 90" width="90" height="90">
+          <defs>
+            <path id="circle-path" d="M 45,45 m -32,0 a 32,32 0 1,1 64,0 a 32,32 0 1,1 -64,0"/>
+          </defs>
+          <circle cx="45" cy="45" r="44" fill="none" stroke="rgba(97,113,255,.25)" stroke-width="1"/>
+          <circle cx="45" cy="45" r="36" fill="rgba(9,9,14,.85)"/>
+          <!-- inner D logo mark placeholder -->
+          <text font-family="DM Sans, sans-serif" font-size="7" font-weight="700" fill="#f2f2f2" letter-spacing="3.2">
+            <textPath href="#circle-path">DEALWISE · DEALWISE · DEALWISE ·</textPath>
+          </text>
+        </svg>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- ═══════════════════════════════════════
+       SESSÃO 2 — NÚMEROS
+  ═══════════════════════════════════════ -->
+  <section id="numbers">
+    <p class="section-label">O que muda quando uma empresa estrutura sua operação de receitas</p>
+    <div class="numbers-grid">
+      <div class="number-card">
+        <span class="number-big">+160%</span>
+        <span class="number-desc">de crescimento médio em 12 meses</span>
+      </div>
+      <div class="number-card">
+        <span class="number-big">3×</span>
+        <span class="number-desc">mais oportunidades qualificadas geradas por mês</span>
+      </div>
+      <div class="number-card">
+        <span class="number-big">62%</span>
+        <span class="number-desc">do faturamento vindo de vendas ativas, sem depender de indicação</span>
+      </div>
+      <div class="number-card">
+        <span class="number-big">5 meses</span>
+        <span class="number-desc">para atingir ou extrapolar a meta anual inteira</span>
+      </div>
+      <div class="number-card">
+        <span class="number-big">R$&nbsp;5M</span>
+        <span class="number-desc">em nova receita gerada em projetos de apenas 5 meses</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════
+       SESSÃO 3 — CONTEXTO
+  ═══════════════════════════════════════ -->
+  <section id="context">
+    <div class="context-text">
+      <h2>A maioria das PMEs B2B cresce<br><span>por acidente.</span></h2>
+      <p>
+        Indicação aqui, vendedor bom ali, founder que não para de prospectar. Funciona por um tempo. Mas quando o dono tira o pé, o número cai. Quando o vendedor sai, o funil esvazia. Quando o mês fecha no vermelho, ninguém sabe exatamente por quê.
+      </p>
+      <p>
+        Isso não é falta de esforço. É falta de controle da operação.
+      </p>
+      <p>
+        O Revenue Lab existe para mudar isso. Em 3 dias presenciais, você vai entender as alavancas do seu negócio, estruturar sua operação de receitas e sair com clareza do que implementar na semana seguinte.
+      </p>
+    </div>
+    <div class="context-visual">
+      <img class="context-heptagono" src="heptagono.png" alt="" aria-hidden="true">
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════
+       SESSÃO 4 — CIDADES
+  ═══════════════════════════════════════ -->
+  <section id="cities">
+    <h2>Duas cidades. Uma metodologia.</h2>
+    <p class="cities-sub">As datas e o local serão informados para quem estiver na lista de espera.</p>
+
+    <div class="cities-grid">
+      <div class="city-card">
+        <p class="city-name">Juiz de Fora</p>
+        <p class="city-state">Minas Gerais</p>
+      </div>
+      <div class="city-card">
+        <p class="city-name">São Paulo</p>
+        <p class="city-state">São Paulo</p>
+      </div>
+    </div>
+
+    <a class="btn-primary" href="#form">Quero ser avisado primeiro</a>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════
+       SESSÃO 5 — FORMULÁRIO
+  ═══════════════════════════════════════ -->
+  <section id="form">
+    <div class="form-intro">
+      <h2>Demonstre interesse e receba todas as informações em primeira mão.</h2>
+      <p>
+        Preencha o formulário ao lado. Nosso time entrará em contato com os detalhes da edição mais próxima de você, incluindo datas, local e condições especiais para quem demonstrou interesse antes do lançamento oficial.
+      </p>
+    </div>
+    <div class="form-wrap">
+      <div role="main" id="lp-dealwise-formulario-revenue-lab-18265f3363dea0c00e6b"></div>
+      <script type="text/javascript" src="https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js"></script>
+      <script type="text/javascript">
+        new RDStationForms('lp-dealwise-formulario-revenue-lab-18265f3363dea0c00e6b', 'UA-163096591-1').createForm();
+      </script>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════
+       SESSÃO 6 — SOBRE A DEALWISE
+  ═══════════════════════════════════════ -->
+  <section id="about">
+    <div class="about-inner">
+      <span class="about-badge">Revenue Builder</span>
+
+      <h2>Quem está por trás<br>do <span>Revenue Lab</span></h2>
+
+      <p>
+        A Dealwise é a primeira Revenue Builder do Brasil. Não somos uma consultoria que ensina o que nunca fez. Crescemos para mais de R$ 10M de faturamento anual a partir de Juiz de Fora, sem investidor externo e sem depender de indicação — usando o mesmo método que ensinamos.
+      </p>
+
+      <p>
+        Esse método se chama REVENUE. São 7 pilares que estruturam toda a operação de receitas de uma empresa. Cada pilar é interdependente. Quando todos funcionam juntos, o crescimento para de ser acidente e vira consequência.
+      </p>
+
+      <div class="revenue-method" aria-label="Método REVENUE">
+        <div class="method-pill">
+          <span class="method-letter">R</span>
+          <span class="method-word">Resultado</span>
+        </div>
+        <div class="method-pill">
+          <span class="method-letter">E</span>
+          <span class="method-word">Estratégia</span>
+        </div>
+        <div class="method-pill">
+          <span class="method-letter">V</span>
+          <span class="method-word">Velocidade</span>
+        </div>
+        <div class="method-pill">
+          <span class="method-letter">E</span>
+          <span class="method-word">Execução</span>
+        </div>
+        <div class="method-pill">
+          <span class="method-letter">N</span>
+          <span class="method-word">Network</span>
+        </div>
+        <div class="method-pill">
+          <span class="method-letter">U</span>
+          <span class="method-word">Usuário</span>
+        </div>
+        <div class="method-pill">
+          <span class="method-letter">E</span>
+          <span class="method-word">Engenharia</span>
+        </div>
+      </div>
+
+      <p>
+        O Revenue Lab é onde você implementa esse sistema na sua empresa, na prática, em 3 dias.
+      </p>
+
+      <div class="about-signatures">
+        <div class="signature">
+          <span class="sig-name">Vítor Baesso</span>
+          <span class="sig-role">Co-CEO, Dealwise</span>
+        </div>
+        <div class="signature">
+          <span class="sig-name">Gabriel Machado</span>
+          <span class="sig-role">Co-CEO, Dealwise</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════ -->
+  <footer>
+    <div class="footer-top">
+      <img class="footer-logo" src="logo-revenue-lab.svg" alt="Revenue Lab by Dealwise">
+      <span class="footer-brand">Dealwise Revenue Builder · © 2026 — Todos os direitos reservados</span>
+    </div>
+    <p class="footer-disclaimer">
+      Os números apresentados nesta página são resultados reais de clientes Dealwise e não configuram promessa ou garantia de resultado. Resultados individuais podem variar de acordo com o contexto, segmento e execução de cada empresa.
+    </p>
+  </footer>
+
+</body>
+</html>
