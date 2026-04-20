@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brandbook — Revenue Lab by Dealwise</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --dark-blue:   #09090e;
+      --deep-blue:   #1b2344;
+      --royal-blue:  #11257c;
+      --vibrant-blue:#6171ff;
+      --baby-blue:   #959fff;
+      --cold-white:  #f2f2f2;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark-blue);
+      color: var(--cold-white);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── CANVAS BEAMS (fixed background) ── */
+    #beams-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    #noise-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: .55;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      background-repeat: repeat;
+      mix-blend-mode: overlay;
+    }
+
+    /* ── PAGE CONTENT (above canvas + noise) ── */
+    .page-content { position: relative; z-index: 2; }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 40px; }
+    section { padding: 80px 0; border-bottom: 1px solid rgba(97,113,255,.1); }
+    section:last-child { border-bottom: none; }
+
+    /* ── LABELS ── */
+    .section-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--vibrant-blue); margin-bottom: 16px;
+    }
+
+    /* ── HEADINGS ── */
+    h1 { font-size: clamp(48px,6vw,80px); font-weight: 800; line-height: 1.05; }
+    h2 { font-size: clamp(28px,3.5vw,42px); font-weight: 800; line-height: 1.1; }
+    h3 { font-size: 20px; font-weight: 700; }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--vibrant-blue), var(--baby-blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── NAV ── */
+    .sidebar-nav {
+      position: fixed; left: 28px; top: 50%;
+      transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 12px; z-index: 100;
+    }
+    .sidebar-nav a {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(97,113,255,.3); display: block;
+      transition: all .2s; text-decoration: none;
+    }
+    .sidebar-nav a:hover { background: var(--vibrant-blue); transform: scale(1.5); }
+    @media (max-width: 900px) { .sidebar-nav { display: none; } }
+
+    /* ── GRIDS ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+    .grid-7 { display: grid; grid-template-columns: repeat(7,1fr); gap: 16px; }
+    @media (max-width: 900px) {
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+      .grid-7 { grid-template-columns: repeat(4,1fr); }
+    }
+    @media (max-width: 600px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: rgba(27,35,68,.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(97,113,255,.12);
+      border-radius: 12px; padding: 28px;
+    }
+    .card-glass {
+      background: linear-gradient(135deg, rgba(97,113,255,.08), rgba(27,35,68,.5));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(97,113,255,.2);
+      border-radius: 12px; padding: 28px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      position: relative; overflow: hidden;
+      border-bottom: 1px solid rgba(97,113,255,.1);
+    }
+    .hero-content { padding: 80px 0; }
+    .hero-logo { height: 48px; margin-bottom: 48px; }
+    .hero-sub {
+      font-size: 18px; font-weight: 500;
+      color: rgba(242,242,242,.6);
+      margin-top: 20px; max-width: 500px; line-height: 1.7;
+    }
+    .hero-meta { margin-top: 48px; display: flex; gap: 40px; flex-wrap: wrap; }
+    .hero-meta-item span {
+      display: block; font-size: 11px; font-weight: 700;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: rgba(242,242,242,.35); margin-bottom: 4px;
+    }
+    .hero-meta-item strong { font-size: 14px; font-weight: 500; color: var(--cold-white); }
+
+    /* ── SWATCHES ── */
+    .swatch { height: 100px; border-radius: 10px 10px 0 0; }
+    .swatch-info {
+      background: rgba(27,35,68,.8); border: 1px solid rgba(255,255,255,.06);
+      border-top: none; border-radius: 0 0 10px 10px; padding: 14px 16px;
+    }
+    .swatch-name { font-size: 13px; font-weight: 700; color: var(--cold-white); }
+    .swatch-hex  { font-size: 12px; font-weight: 500; color: rgba(242,242,242,.45); margin-top: 2px; font-family: monospace; }
+    .swatch-use  { font-size: 11px; font-weight: 500; color: rgba(242,242,242,.35); margin-top: 6px; line-height: 1.5; }
+
+    /* ── TYPE ROWS ── */
+    .type-row {
+      display: flex; align-items: baseline; gap: 32px;
+      padding: 24px 0; border-bottom: 1px solid rgba(97,113,255,.08);
+    }
+    .type-row:last-child { border-bottom: none; }
+    .type-meta { min-width: 140px; flex-shrink: 0; }
+    .type-meta .lbl { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--vibrant-blue); }
+    .type-meta .wt  { font-size: 12px; font-weight: 500; color: rgba(242,242,242,.4); margin-top: 4px; }
+
+    /* ── LOGO CARDS ── */
+    .logo-card {
+      border-radius: 12px; padding: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(97,113,255,.12); min-height: 140px;
+    }
+    .logo-card img { max-height: 60px; max-width: 100%; }
+    .logo-card-label {
+      font-size: 11px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; color: rgba(242,242,242,.35);
+      text-align: center; margin-top: 12px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'DM Sans', sans-serif; font-weight: 700;
+      border-radius: 8px; cursor: pointer; border: none;
+      font-size: 15px; padding: 14px 28px; text-decoration: none;
+    }
+    .btn-primary  { background: var(--vibrant-blue); color: #fff; }
+    .btn-gradient { background: linear-gradient(135deg, var(--royal-blue), var(--vibrant-blue)); color: #fff; }
+    .btn-outline  { background: transparent; color: var(--vibrant-blue); border: 1.5px solid var(--vibrant-blue); }
+    .btn-ghost    { background: rgba(97,113,255,.1); color: var(--baby-blue); }
+    .btn-wrap     { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-top: 24px; }
+
+    /* ── GRAD CARDS ── */
+    .grad-card {
+      height: 120px; border-radius: 12px;
+      display: flex; align-items: flex-end; padding: 16px;
+    }
+    .grad-card span { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.7); }
+
+    /* ── ICON SYSTEM ── */
+    .icon-card {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 12px; text-align: center;
+    }
+    .icon-svg-wrap {
+      width: 72px; height: 72px; flex-shrink: 0;
+    }
+    .icon-card .icon-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--vibrant-blue);
+    }
+    .icon-card .icon-name {
+      font-size: 13px; font-weight: 700; color: var(--cold-white); margin-top: 2px;
+    }
+
+    /* ── ANATOMY ── */
+    .anatomy-wrap { display: flex; gap: 48px; align-items: center; }
+    .anatomy-icon { width: 200px; flex-shrink: 0; }
+    .legend-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(97,113,255,.08);
+    }
+    .legend-item:last-child { border-bottom: none; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+    .legend-text .ttl { font-size: 14px; font-weight: 700; color: var(--cold-white); }
+    .legend-text .dsc { font-size: 12px; font-weight: 500; color: rgba(242,242,242,.5); margin-top: 2px; }
+
+    /* ── DO/DONT ── */
+    .dont-card {
+      background: rgba(255,60,60,.04); border: 1px solid rgba(255,60,60,.15);
+      border-radius: 12px; padding: 20px;
+    }
+    .dont-card .dlbl { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: #ff6b6b; margin-bottom: 8px; }
+    .dont-card p     { font-size: 13px; color: rgba(242,242,242,.6); line-height: 1.5; }
+    .do-card {
+      background: rgba(97,113,255,.04); border: 1px solid rgba(97,113,255,.2);
+      border-radius: 12px; padding: 20px;
+    }
+    .do-card .dolbl { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--vibrant-blue); margin-bottom: 8px; }
+    .do-card p      { font-size: 13px; color: rgba(242,242,242,.6); line-height: 1.5; }
+
+    /* ── HERO DEMO CARD ── */
+    .demo-hero {
+      background: var(--dark-blue); border: 1px solid rgba(97,113,255,.12);
+      border-radius: 16px; padding: 48px; position: relative; overflow: hidden;
+    }
+    .demo-hero-hept {
+      position: absolute; right: -80px; top: -80px;
+      width: 360px; opacity: .1; filter: blur(6px); pointer-events: none;
+    }
+    .demo-hero > * { position: relative; z-index: 2; }
+
+    /* ── POSICIONAMENTO ── */
+    .pos-badge {
+      display: inline-block;
+      background: rgba(97,113,255,.12);
+      border: 1px solid rgba(97,113,255,.3);
+      border-radius: 100px; padding: 6px 16px;
+      font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--baby-blue);
+    }
+    .diff-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 20px 0; border-bottom: 1px solid rgba(97,113,255,.08);
+    }
+    .diff-item:last-child { border-bottom: none; }
+    .diff-num {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: rgba(97,113,255,.15); border: 1px solid rgba(97,113,255,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: var(--vibrant-blue);
+      flex-shrink: 0;
+    }
+
+    footer { padding: 48px 0; text-align: center; color: rgba(242,242,242,.3); font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<!-- BEAMS CANVAS -->
+<canvas id="beams-canvas"></canvas>
+<!-- NOISE -->
+<div id="noise-overlay"></div>
+
+<!-- NAV -->
+<nav class="sidebar-nav">
+  <a href="#hero"></a>
+  <a href="#identidade"></a>
+  <a href="#posicionamento"></a>
+  <a href="#cores"></a>
+  <a href="#tipografia"></a>
+  <a href="#logos"></a>
+  <a href="#heptagono"></a>
+  <a href="#gradientes"></a>
+  <a href="#aplicacoes"></a>
+  <a href="#evitar"></a>
+</nav>
+
+<div class="page-content">
+
+<!-- ══════════════════════════ HERO ══════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="container">
+    <div class="hero-content">
+      <img class="hero-logo"
+        src="Logotipo/Revenue Lab Export de versões do logo e heptagono_Revenue Lab versao principal alinhada a esquerda para fundos escuros com assinatura by dealwise.svg"
+        alt="Revenue Lab by Dealwise">
+      <p style="font-size:12px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:20px">Brandbook Oficial · Versão 1.0 · 2026</p>
+      <h1 style="color:var(--cold-white)">Identidade Visual<br><span class="gradient-text">Revenue Lab</span></h1>
+      <p class="hero-sub">Diretrizes completas para criação de todos os materiais do evento. Consistência em cada peça.</p>
+      <div class="hero-meta">
+        <div class="hero-meta-item"><span>Fonte</span><strong>DM Sans</strong></div>
+        <div class="hero-meta-item"><span>Cor de ação</span><strong>#6171ff Vibrant Blue</strong></div>
+        <div class="hero-meta-item"><span>Elemento símbolo</span><strong>Heptágono — 7 pilares REVENUE</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ O QUE É O REVENUE LAB ══════════════════════════ -->
+<section id="identidade">
+  <div class="container">
+    <p class="section-label">01 — Identidade da Marca</p>
+    <h2>O que é o <span class="gradient-text">Revenue Lab</span></h2>
+    <div style="height:32px"></div>
+    <div class="grid-3">
+      <div class="card">
+        <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:12px">Categoria</p>
+        <h3 style="color:var(--cold-white);margin-bottom:8px">Revenue Builder</h3>
+        <p style="font-size:14px;color:rgba(242,242,242,.6);line-height:1.6">Não é curso, não é mentoria genérica. É construção prática de um sistema completo de operação de receita.</p>
+      </div>
+      <div class="card">
+        <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:12px">Promessa Central</p>
+        <h3 style="color:var(--cold-white);margin-bottom:8px">3 dias, 1 sistema</h3>
+        <p style="font-size:14px;color:rgba(242,242,242,.6);line-height:1.6">Em 3 dias, você constrói sua operação de receita completa — pronta para implementar no dia seguinte.</p>
+      </div>
+      <div class="card">
+        <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:12px">Tom Visual</p>
+        <h3 style="color:var(--cold-white);margin-bottom:8px">Premium Técnico</h3>
+        <p style="font-size:14px;color:rgba(242,242,242,.6);line-height:1.6">Dark, vibrante, estruturado. Parece uma empresa que cresce — não uma que ensina crescimento.</p>
+      </div>
+    </div>
+    <div style="height:24px"></div>
+    <div class="card-glass">
+      <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:16px">Big Idea — Fio Condutor de Toda Comunicação</p>
+      <p style="font-size:clamp(22px,3vw,32px);font-weight:800;color:var(--cold-white);line-height:1.25">"Quem não controla a operação,<br>não controla o crescimento."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ POSICIONAMENTO ══════════════════════════ -->
+<section id="posicionamento">
+  <div class="container">
+    <p class="section-label">02 — Posicionamento</p>
+    <h2>Posição de <span class="gradient-text">Mercado</span></h2>
+    <div style="height:32px"></div>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:16px">Categoria criada</p>
+        <span class="pos-badge">Revenue Builder</span>
+        <p style="font-size:14px;color:rgba(242,242,242,.6);line-height:1.6;margin-top:16px">A Dealwise não é aceleradora, consultoria, nem curso. É uma Revenue Builder — empresa que entra na operação do cliente e constrói o sistema que vai gerar receita de forma previsível.</p>
+      </div>
+      <div class="card">
+        <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:16px">Público-alvo</p>
+        <p style="font-size:14px;color:rgba(242,242,242,.6);line-height:1.6">CEOs, sócios e diretores de PMEs B2B com 10 a 300 funcionários. Estão presos na operação, dependem de indicação, são o gargalo das vendas. Querem controle e previsibilidade — não mais esforço.</p>
+        <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px">
+          <span style="background:rgba(97,113,255,.1);border:1px solid rgba(97,113,255,.25);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--baby-blue)">Tech / SaaS</span>
+          <span style="background:rgba(97,113,255,.1);border:1px solid rgba(97,113,255,.25);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--baby-blue)">Advocacia B2B</span>
+          <span style="background:rgba(97,113,255,.1);border:1px solid rgba(97,113,255,.25);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--baby-blue)">Engenharia</span>
+          <span style="background:rgba(97,113,255,.1);border:1px solid rgba(97,113,255,.25);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--baby-blue)">Indústria</span>
+          <span style="background:rgba(97,113,255,.1);border:1px solid rgba(97,113,255,.25);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--baby-blue)">Agências</span>
+          <span style="background:rgba(97,113,255,.1);border:1px solid rgba(97,113,255,.25);border-radius:100px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--baby-blue)">Financeiro</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:20px">4 Diferenciais Inegociáveis</p>
+      <div>
+        <div class="diff-item">
+          <div class="diff-num">1</div>
+          <div>
+            <p style="font-size:15px;font-weight:700;color:var(--cold-white);margin-bottom:4px">Crescemos com nosso próprio método</p>
+            <p style="font-size:14px;color:rgba(242,242,242,.6);line-height:1.5">A Dealwise nasceu em Juiz de Fora sem investidor, sem sócio famoso, sem mídia pesada. Escalou para +10M de faturamento com a mesma metodologia ensinada no evento. Somos o case que pregamos.</p>
+          </div>
+        </div>
+        <div class="diff-item">
+          <div class="diff-num">2</div>
+          <div>
+            <p style="font-size:15px;font-weight:700;color:var(--cold-white);margin-bottom:4px">Evento que entrega — não que vende outro produto no final</p>
+            <p style="font-size:14px;color:rgba(242,242,242,.6);line-height:1.5">Os concorrentes prometem muito e usam o evento como funil. O Revenue Lab é o produto. O empresário sai com sistema pronto para rodar no dia seguinte.</p>
+          </div>
+        </div>
+        <div class="diff-item">
+          <div class="diff-num">3</div>
+          <div>
+            <p style="font-size:15px;font-weight:700;color:var(--cold-white);margin-bottom:4px">Único que resolve o pilar de Pessoas</p>
+            <p style="font-size:14px;color:rgba(242,242,242,.6);line-height:1.5">Outros ensinam processo e estratégia. Depois o empresário volta para o time que não executa. O Dia 3 resolve isso: atração, seleção, onboarding, performance e retenção de talentos comerciais.</p>
+          </div>
+        </div>
+        <div class="diff-item">
+          <div class="diff-num">4</div>
+          <div>
+            <p style="font-size:15px;font-weight:700;color:var(--cold-white);margin-bottom:4px">Operação de receita completa — não só "máquina de vendas"</p>
+            <p style="font-size:14px;color:rgba(242,242,242,.6);line-height:1.5">Estratégia, processo, gestão de rotina, resultados, pessoas e tecnologia — tudo integrado num único sistema. Revenue Operation, não vendas isoladas.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card" style="text-align:center">
+        <p style="font-size:36px;font-weight:800;color:var(--vibrant-blue)">+160%</p>
+        <p style="font-size:14px;font-weight:700;color:var(--cold-white);margin:4px 0">Crescimento médio</p>
+        <p style="font-size:12px;color:rgba(242,242,242,.5)">Em 12 meses após o Método REVENUE</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <p style="font-size:36px;font-weight:800;color:var(--vibrant-blue)">3x</p>
+        <p style="font-size:14px;font-weight:700;color:var(--cold-white);margin:4px 0">Mais oportunidades</p>
+        <p style="font-size:12px;color:rgba(242,242,242,.5)">De 6 para 19 reuniões/vendedor por mês</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <p style="font-size:36px;font-weight:800;color:var(--vibrant-blue)">+3.000</p>
+        <p style="font-size:14px;font-weight:700;color:var(--cold-white);margin:4px 0">Empresas aceleradas</p>
+        <p style="font-size:12px;color:rgba(242,242,242,.5)">Brasil, LATAM e Europa em 7 anos</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ CORES ══════════════════════════ -->
+<section id="cores">
+  <div class="container">
+    <p class="section-label">03 — Paleta de Cores</p>
+    <h2>Cores da <span class="gradient-text">Marca</span></h2>
+    <div style="height:32px"></div>
+
+    <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(242,242,242,.35);margin-bottom:16px">Cores Primárias</p>
+    <div class="grid-3" style="margin-bottom:24px">
+      <div>
+        <div class="swatch" style="background:#09090e;border:1px solid rgba(255,255,255,.06);border-radius:10px 10px 0 0"></div>
+        <div class="swatch-info"><p class="swatch-name">Dark Blue</p><p class="swatch-hex">#09090e</p><p class="swatch-use">Fundo principal. Base de toda composição dark.</p></div>
+      </div>
+      <div>
+        <div class="swatch" style="background:#1b2344;border-radius:10px 10px 0 0"></div>
+        <div class="swatch-info"><p class="swatch-name">Deep Blue</p><p class="swatch-hex">#1b2344</p><p class="swatch-use">Fundo secundário. Seções alternadas, cards, superfícies elevadas.</p></div>
+      </div>
+      <div>
+        <div class="swatch" style="background:#6171ff;border-radius:10px 10px 0 0"></div>
+        <div class="swatch-info"><p class="swatch-name">Vibrant Blue</p><p class="swatch-hex">#6171ff</p><p class="swatch-use">Cor de ação. Títulos, CTAs, botões, logotipo "lab", ícone heptagonal.</p></div>
+      </div>
+    </div>
+
+    <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(242,242,242,.35);margin-bottom:16px">Cores de Apoio</p>
+    <div class="grid-3">
+      <div>
+        <div class="swatch" style="background:#11257c;border-radius:10px 10px 0 0"></div>
+        <div class="swatch-info"><p class="swatch-name">Royal Blue</p><p class="swatch-hex">#11257c</p><p class="swatch-use">Degradês, profundidade, início de gradientes.</p></div>
+      </div>
+      <div>
+        <div class="swatch" style="background:#959fff;border-radius:10px 10px 0 0"></div>
+        <div class="swatch-info"><p class="swatch-name">Baby Blue</p><p class="swatch-hex">#959fff</p><p class="swatch-use">Final de gradientes, tipografia secundária, elementos suaves.</p></div>
+      </div>
+      <div>
+        <div class="swatch" style="background:#f2f2f2;border-radius:10px 10px 0 0"></div>
+        <div class="swatch-info"><p class="swatch-name">Cold White</p><p class="swatch-hex">#f2f2f2</p><p class="swatch-use">Texto em fundo escuro, wordmark "revenue". Nunca branco puro #ffffff.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ TIPOGRAFIA ══════════════════════════ -->
+<section id="tipografia">
+  <div class="container">
+    <p class="section-label">04 — Tipografia</p>
+    <h2>DM Sans — <span class="gradient-text">Família Única</span></h2>
+    <p style="color:rgba(242,242,242,.5);font-size:16px;margin-top:8px;margin-bottom:40px">Todo o Revenue Lab usa exclusivamente DM Sans. Nenhuma fonte serifada ou script.</p>
+
+    <div class="card" style="padding:0 28px;margin-bottom:32px">
+      <div class="type-row">
+        <div class="type-meta"><p class="lbl">H1 — Título</p><p class="wt">ExtraBold · 800</p></div>
+        <p style="font-size:clamp(36px,5vw,56px);font-weight:800;color:var(--vibrant-blue);line-height:1.05">Controle o crescimento</p>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><p class="lbl">H1 — Gradiente</p><p class="wt">ExtraBold · 800</p></div>
+        <p style="font-size:clamp(36px,5vw,56px);font-weight:800;line-height:1.05;background:linear-gradient(135deg,var(--vibrant-blue),var(--baby-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">da sua empresa.</p>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><p class="lbl">H2 — Seção</p><p class="wt">Bold · 700</p></div>
+        <p style="font-size:clamp(24px,3vw,36px);font-weight:700;color:var(--cold-white);line-height:1.1">Operação de Receita Completa</p>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><p class="lbl">H3 — Subtópico</p><p class="wt">Bold · 700</p></div>
+        <p style="font-size:22px;font-weight:700;color:var(--cold-white)">Método REVENUE — 7 pilares</p>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><p class="lbl">Corpo</p><p class="wt">Medium · 500</p></div>
+        <p style="font-size:16px;font-weight:500;color:rgba(242,242,242,.7);max-width:560px">Em 3 dias, você constrói sua operação de receita completa e sai com tudo pronto para implementar no dia seguinte. Não é teoria. É construção.</p>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><p class="lbl">Label</p><p class="wt">Bold · 700</p></div>
+        <p style="font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--vibrant-blue)">Imersão Presencial · Juiz de Fora e São Paulo · 2026</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card" style="text-align:center;padding:40px">
+        <p style="font-size:52px;font-weight:800;background:linear-gradient(135deg,var(--vibrant-blue),var(--baby-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1">REVENUE</p>
+        <p style="font-size:12px;color:rgba(242,242,242,.4);margin-top:14px">Gradiente em palavras-chave: Vibrant Blue → Baby Blue, 135°</p>
+      </div>
+      <div class="card" style="text-align:center;padding:40px">
+        <p style="font-size:52px;font-weight:800;background:linear-gradient(135deg,var(--royal-blue),var(--vibrant-blue),var(--baby-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1">CONTROLE</p>
+        <p style="font-size:12px;color:rgba(242,242,242,.4);margin-top:14px">Full spectrum: Royal → Vibrant → Baby. Usar em hero sections.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ LOGOS ══════════════════════════ -->
+<section id="logos">
+  <div class="container">
+    <p class="section-label">05 — Logos e Versões</p>
+    <h2>Sistema de <span class="gradient-text">Logotipos</span></h2>
+    <div style="height:32px"></div>
+
+    <!-- ANATOMIA -->
+    <div class="card" style="margin-bottom:32px">
+      <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:24px">Anatomia do Logo</p>
+      <div class="anatomy-wrap">
+        <div class="anatomy-icon">
+          <!-- Monochromatic version with CSS filter for white on dark bg -->
+          <img src="Logotipo/Revenue Lab Export de versões do logo e heptagono_Revenue Lab versao centralizada monocromatica com assinatura by dealwise.svg"
+               alt="Ícone Revenue Lab"
+               style="width:180px;filter:brightness(0) invert(1) opacity(.92)">
+        </div>
+        <div class="anatomy-legend" style="flex:1">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--vibrant-blue)"></div>
+            <div class="legend-text">
+              <p class="ttl">7 segmentos do ícone heptagonal</p>
+              <p class="dsc">Vibrant Blue #6171ff — cada segmento representa 1 letra/pilar do método REVENUE. Cada peça tem formato de funil, simbolizando conversão.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--cold-white)"></div>
+            <div class="legend-text">
+              <p class="ttl">7 conectores externos + wordmark "revenue"</p>
+              <p class="dsc">Cold White #f2f2f2 — fragmentos de transição entre os segmentos. A forma da engrenagem sugere um sistema interligado e em movimento.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--vibrant-blue)"></div>
+            <div class="legend-text">
+              <p class="ttl">"lab" em Vibrant Blue</p>
+              <p class="dsc">O destaque intencional — "revenue" é o contexto, "lab" é a diferenciação. Nunca uniformizar as cores entre as duas palavras.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:rgba(242,242,242,.4)"></div>
+            <div class="legend-text">
+              <p class="ttl">Assinatura "BY DEALWISE"</p>
+              <p class="dsc">Cold White reduzido, DM Sans Medium, caixa alta — âncora institucional que conecta o evento à marca-mãe.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VERSÕES -->
+    <div class="grid-2" style="margin-bottom:16px">
+      <div>
+        <div class="logo-card" style="background:#09090e">
+          <img src="Logotipo/Revenue Lab Export de versões do logo e heptagono_Revenue Lab versao principal alinhada a esquerda para fundos escuros com assinatura by dealwise.svg" alt="">
+        </div>
+        <p class="logo-card-label">Principal — Fundo Escuro (uso padrão)</p>
+      </div>
+      <div>
+        <div class="logo-card" style="background:#f2f2f2">
+          <img src="Logotipo/Revenue Lab Export de versões do logo e heptagono_Revenue Lab versao principal alinhada a esquerda para fundos claros com assinatura by dealwise.svg" alt="">
+        </div>
+        <p class="logo-card-label">Principal — Fundo Claro</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-bottom:16px">
+      <div>
+        <div class="logo-card" style="background:#1b2344;min-height:120px">
+          <img src="Logotipo/Revenue Lab Export de versões do logo e heptagono_Revenue Lab versao principal alinhada a esquerda para fundos escuros sem assinatura.svg" alt="">
+        </div>
+        <p class="logo-card-label">Sem assinatura — Compacto</p>
+      </div>
+      <div>
+        <div class="logo-card" style="background:#09090e;flex-direction:column;min-height:160px">
+          <img src="Logotipo/Revenue Lab Export de versões do logo e heptagono_Revenue Lab versao vertical alinhada a esquerda para fundos escuros com assinatura by dealwise.svg" alt="" style="max-height:100px">
+        </div>
+        <p class="logo-card-label">Vertical — Fundo Escuro</p>
+      </div>
+      <div>
+        <!-- Monocromático aplicado em Cold White sobre fundo escuro -->
+        <div class="logo-card" style="background:#09090e;min-height:120px">
+          <img src="Logotipo/Revenue Lab Export de versões do logo e heptagono_Revenue Lab versao principal alinhada a esquerda monocromatica com assinatura by dealwise.svg" alt=""
+               style="filter:brightness(0) invert(1) opacity(.92)">
+        </div>
+        <p class="logo-card-label">Monocromático — Cold White sobre escuro</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="logo-card" style="background:#f2f2f2;min-height:100px">
+          <img src="Logotipo/Dealwise Logo monocromatico.svg" alt="Dealwise" style="max-height:36px">
+        </div>
+        <p class="logo-card-label">Dealwise — Rodapés e co-branding</p>
+      </div>
+      <div class="card">
+        <p style="font-size:13px;font-weight:700;color:var(--cold-white);margin-bottom:10px">Regra do Monocromático</p>
+        <p style="font-size:13px;color:rgba(242,242,242,.6);line-height:1.6;margin-bottom:14px">A versão monocromática assume a cor que gera contraste com o fundo: <strong style="color:var(--cold-white)">Cold White #f2f2f2</strong> em fundos escuros, <strong style="color:var(--cold-white)">Dark Blue #09090e</strong> em fundos claros. Nunca aplicar sobre fundo da mesma cor.</p>
+        <p style="font-size:13px;font-weight:700;color:var(--cold-white);margin-bottom:6px">Regra crítica do wordmark</p>
+        <p style="font-size:13px;color:rgba(242,242,242,.6)">"revenue" e "lab" têm cores diferentes intencionalmente. <strong style="color:var(--cold-white)">Nunca uniformizar.</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ HEPTÁGONO ══════════════════════════ -->
+<section id="heptagono">
+  <div class="container">
+    <p class="section-label">06 — O Heptágono</p>
+    <h2>O Símbolo dos <span class="gradient-text">7 Pilares</span></h2>
+    <div style="height:8px"></div>
+    <p style="color:rgba(242,242,242,.5);font-size:16px;margin-bottom:40px;max-width:680px">REVENUE tem 7 letras. Cada letra é um pilar. Cada segmento do ícone é um funil de conversão — e juntos formam uma engrenagem: uma operação de receita completa, interligada e em movimento.</p>
+
+    <!-- SIGNIFICADO DO ÍCONE -->
+    <div class="card" style="margin-bottom:32px">
+      <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:20px">O que o ícone representa</p>
+      <div class="grid-3">
+        <div style="padding:20px;border-right:1px solid rgba(97,113,255,.1)">
+          <p style="font-size:22px;margin-bottom:10px">▽</p>
+          <p style="font-size:14px;font-weight:700;color:var(--cold-white);margin-bottom:6px">7 Funis</p>
+          <p style="font-size:13px;color:rgba(242,242,242,.5);line-height:1.5">Cada segmento tem formato de funil — representa conversão, o coração de qualquer operação comercial.</p>
+        </div>
+        <div style="padding:20px;border-right:1px solid rgba(97,113,255,.1)">
+          <p style="font-size:22px;margin-bottom:10px">⚙</p>
+          <p style="font-size:14px;font-weight:700;color:var(--cold-white);margin-bottom:6px">Uma Engrenagem</p>
+          <p style="font-size:13px;color:rgba(242,242,242,.5);line-height:1.5">Os 7 segmentos interligados formam uma engrenagem — sistema rodando com suas próprias peças encaixadas.</p>
+        </div>
+        <div style="padding:20px">
+          <p style="font-size:22px;margin-bottom:10px">◎</p>
+          <p style="font-size:14px;font-weight:700;color:var(--cold-white);margin-bottom:6px">O Método REVENUE</p>
+          <p style="font-size:13px;color:rgba(242,242,242,.5);line-height:1.5">Resultado · Estratégia · Velocidade · Execução · Network · Usuário · Engenharia — 7 letras, 7 segmentos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SISTEMA DE ÍCONES -->
+    <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(242,242,242,.35);margin-bottom:20px">Sistema de ícones — um por pilar</p>
+    <div class="card">
+      <div class="grid-7">
+
+        <!-- R — Resultado -->
+        <div class="icon-card">
+          <div class="icon-svg-wrap">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="50,8 82.8,23.8 90.9,59.3 68.2,87.9 31.8,87.9 9.1,59.3 17.2,23.8"
+                fill="rgba(97,113,255,0.08)" stroke="#6171ff" stroke-width="1.8"/>
+              <rect x="30" y="57" width="9" height="18" rx="2" fill="#6171ff" opacity=".5"/>
+              <rect x="44" y="46" width="9" height="29" rx="2" fill="#6171ff" opacity=".75"/>
+              <rect x="58" y="34" width="9" height="41" rx="2" fill="#6171ff"/>
+            </svg>
+          </div>
+          <p class="icon-label">R</p>
+          <p class="icon-name">Resultado</p>
+        </div>
+
+        <!-- E — Estratégia -->
+        <div class="icon-card">
+          <div class="icon-svg-wrap">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="50,8 82.8,23.8 90.9,59.3 68.2,87.9 31.8,87.9 9.1,59.3 17.2,23.8"
+                fill="rgba(97,113,255,0.08)" stroke="#6171ff" stroke-width="1.8"/>
+              <circle cx="50" cy="50" r="18" stroke="#6171ff" stroke-width="2" opacity=".4"/>
+              <line x1="50" y1="32" x2="50" y2="68" stroke="#f2f2f2" stroke-width="1.2" opacity=".3"/>
+              <line x1="32" y1="50" x2="68" y2="50" stroke="#f2f2f2" stroke-width="1.2" opacity=".3"/>
+              <circle cx="50" cy="50" r="5" fill="#6171ff"/>
+              <line x1="50" y1="32" x2="64" y2="38" stroke="#6171ff" stroke-width="2.5" stroke-linecap="round"/>
+              <polygon points="64,32 72,38 62,42" fill="#6171ff"/>
+            </svg>
+          </div>
+          <p class="icon-label">E</p>
+          <p class="icon-name">Estratégia</p>
+        </div>
+
+        <!-- V — Velocidade -->
+        <div class="icon-card">
+          <div class="icon-svg-wrap">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="50,8 82.8,23.8 90.9,59.3 68.2,87.9 31.8,87.9 9.1,59.3 17.2,23.8"
+                fill="rgba(97,113,255,0.08)" stroke="#6171ff" stroke-width="1.8"/>
+              <path d="M56,22 L38,53 L51,53 L44,78 L65,44 L52,44 Z"
+                fill="#6171ff" stroke="#959fff" stroke-width="1" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="icon-label">V</p>
+          <p class="icon-name">Velocidade</p>
+        </div>
+
+        <!-- E — Execução -->
+        <div class="icon-card">
+          <div class="icon-svg-wrap">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="50,8 82.8,23.8 90.9,59.3 68.2,87.9 31.8,87.9 9.1,59.3 17.2,23.8"
+                fill="rgba(97,113,255,0.08)" stroke="#6171ff" stroke-width="1.8"/>
+              <polyline points="28,50 43,65 72,34"
+                stroke="#6171ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="icon-label">E</p>
+          <p class="icon-name">Execução</p>
+        </div>
+
+        <!-- N — Network -->
+        <div class="icon-card">
+          <div class="icon-svg-wrap">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="50,8 82.8,23.8 90.9,59.3 68.2,87.9 31.8,87.9 9.1,59.3 17.2,23.8"
+                fill="rgba(97,113,255,0.08)" stroke="#6171ff" stroke-width="1.8"/>
+              <line x1="50" y1="32" x2="31" y2="67" stroke="#959fff" stroke-width="1.5" opacity=".6"/>
+              <line x1="50" y1="32" x2="69" y2="67" stroke="#959fff" stroke-width="1.5" opacity=".6"/>
+              <line x1="31" y1="67" x2="69" y2="67" stroke="#959fff" stroke-width="1.5" opacity=".6"/>
+              <circle cx="50" cy="32" r="7" fill="#6171ff"/>
+              <circle cx="31" cy="67" r="7" fill="#6171ff" opacity=".7"/>
+              <circle cx="69" cy="67" r="7" fill="#6171ff" opacity=".7"/>
+            </svg>
+          </div>
+          <p class="icon-label">N</p>
+          <p class="icon-name">Network</p>
+        </div>
+
+        <!-- U — Usuário -->
+        <div class="icon-card">
+          <div class="icon-svg-wrap">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="50,8 82.8,23.8 90.9,59.3 68.2,87.9 31.8,87.9 9.1,59.3 17.2,23.8"
+                fill="rgba(97,113,255,0.08)" stroke="#6171ff" stroke-width="1.8"/>
+              <circle cx="50" cy="38" r="12" stroke="#6171ff" stroke-width="2.5"/>
+              <path d="M27,76 C27,62 38,56 50,56 C62,56 73,62 73,76"
+                stroke="#6171ff" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <p class="icon-label">U</p>
+          <p class="icon-name">Usuário</p>
+        </div>
+
+        <!-- E — Engenharia -->
+        <div class="icon-card">
+          <div class="icon-svg-wrap">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="50,8 82.8,23.8 90.9,59.3 68.2,87.9 31.8,87.9 9.1,59.3 17.2,23.8"
+                fill="rgba(97,113,255,0.08)" stroke="#6171ff" stroke-width="1.8"/>
+              <circle cx="50" cy="50" r="14" stroke="#6171ff" stroke-width="2.5"/>
+              <circle cx="50" cy="50" r="5" fill="#6171ff"/>
+              <rect x="47" y="23" width="6" height="10" rx="3" fill="#6171ff" transform="rotate(0 50 50)"/>
+              <rect x="47" y="23" width="6" height="10" rx="3" fill="#6171ff" transform="rotate(51.4 50 50)"/>
+              <rect x="47" y="23" width="6" height="10" rx="3" fill="#6171ff" transform="rotate(102.8 50 50)"/>
+              <rect x="47" y="23" width="6" height="10" rx="3" fill="#6171ff" transform="rotate(154.3 50 50)"/>
+              <rect x="47" y="23" width="6" height="10" rx="3" fill="#6171ff" transform="rotate(205.7 50 50)"/>
+              <rect x="47" y="23" width="6" height="10" rx="3" fill="#6171ff" transform="rotate(257.1 50 50)"/>
+              <rect x="47" y="23" width="6" height="10" rx="3" fill="#6171ff" transform="rotate(308.6 50 50)"/>
+            </svg>
+          </div>
+          <p class="icon-label">E</p>
+          <p class="icon-name">Engenharia</p>
+        </div>
+
+      </div>
+      <p style="font-size:12px;color:rgba(242,242,242,.35);margin-top:20px;text-align:center">Todos os ícones usam o heptágono como frame — geometria consistente com o logo</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ GRADIENTES ══════════════════════════ -->
+<section id="gradientes">
+  <div class="container">
+    <p class="section-label">07 — Gradientes</p>
+    <h2>Sistema de <span class="gradient-text">Gradientes</span></h2>
+    <div style="height:32px"></div>
+    <div class="grid-3">
+      <div>
+        <div class="grad-card" style="background:linear-gradient(135deg,#11257c,#6171ff)"><span>Royal → Vibrant</span></div>
+        <p style="font-size:12px;color:rgba(242,242,242,.5);margin-top:10px">Botões, bordas de cards premium, textos de impacto</p>
+      </div>
+      <div>
+        <div class="grad-card" style="background:linear-gradient(135deg,#6171ff,#959fff)"><span>Vibrant → Baby</span></div>
+        <p style="font-size:12px;color:rgba(242,242,242,.5);margin-top:10px">Tipografia de destaque, badges, labels</p>
+      </div>
+      <div>
+        <div class="grad-card" style="background:linear-gradient(135deg,#11257c,#6171ff,#959fff)"><span>Full Spectrum</span></div>
+        <p style="font-size:12px;color:rgba(242,242,242,.5);margin-top:10px">Hero sections, peças especiais, capas</p>
+      </div>
+      <div>
+        <div class="grad-card" style="background:linear-gradient(180deg,#1b2344 0%,#09090e 100%)"><span>Fundos — Deep → Dark</span></div>
+        <p style="font-size:12px;color:rgba(242,242,242,.5);margin-top:10px">Transição entre seções. Profundidade sem cor.</p>
+      </div>
+      <div>
+        <div class="grad-card" style="background:radial-gradient(circle at 35% 50%,rgba(97,113,255,.2) 0%,transparent 70%),#09090e"><span>Glow radial</span></div>
+        <p style="font-size:12px;color:rgba(242,242,242,.5);margin-top:10px">Brilho sutil em hero sections e cards principais</p>
+      </div>
+      <div>
+        <div class="grad-card" style="background:linear-gradient(135deg,rgba(97,113,255,.15),rgba(27,35,68,.7));border:1px solid rgba(97,113,255,.25)"><span>Glass card</span></div>
+        <p style="font-size:12px;color:rgba(242,242,242,.5);margin-top:10px">Cards translúcidos — depoimentos, features, specs</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ APLICAÇÕES ══════════════════════════ -->
+<section id="aplicacoes">
+  <div class="container">
+    <p class="section-label">08 — Aplicações</p>
+    <h2>Exemplos de <span class="gradient-text">Uso</span></h2>
+    <div style="height:32px"></div>
+
+    <!-- BOTÕES -->
+    <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(242,242,242,.35);margin-bottom:12px">Botões</p>
+    <div class="card" style="margin-bottom:24px">
+      <div class="btn-wrap">
+        <a class="btn btn-primary" href="#">Quero garantir minha vaga</a>
+        <a class="btn btn-gradient" href="#">Quero garantir minha vaga</a>
+        <a class="btn btn-outline" href="#">Ver programação completa</a>
+        <a class="btn btn-ghost" href="#">Saiba mais</a>
+      </div>
+      <div style="height:16px"></div>
+      <!-- Botão com texto em gradiente -->
+      <div class="btn-wrap">
+        <button class="btn" style="background:rgba(97,113,255,.1);border:1px solid rgba(97,113,255,.3);padding:14px 28px">
+          <span style="background:linear-gradient(135deg,var(--vibrant-blue),var(--baby-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:800;font-size:15px">Texto em gradiente</span>
+        </button>
+        <button class="btn" style="background:linear-gradient(135deg,#11257c,#6171ff,#959fff);padding:14px 28px;font-weight:800">
+          Full Spectrum CTA
+        </button>
+      </div>
+      <p style="font-size:12px;color:rgba(242,242,242,.4);margin-top:16px">CTA principal: Vibrant Blue sólido (linha 1) ou gradiente (linha 2). Nunca usar outra cor para o botão de conversão.</p>
+    </div>
+
+    <!-- HERO DEMO -->
+    <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(242,242,242,.35);margin-bottom:12px">Hero / Seção Principal</p>
+    <div class="demo-hero" style="margin-bottom:24px">
+      <img class="demo-hero-hept"
+        src="Logotipo/Revenue Lab Export de versões do logo e heptagono_Revenue Lab elemento heptagono para fundos.svg" alt="">
+      <p style="font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--vibrant-blue);margin-bottom:16px">Imersão Presencial · Juiz de Fora e São Paulo · 2026</p>
+      <h2 style="color:var(--cold-white);margin-bottom:8px;font-size:clamp(28px,4vw,48px)">Controle o crescimento<br><span class="gradient-text">da sua empresa.</span></h2>
+      <p style="color:rgba(242,242,242,.6);max-width:520px;margin-bottom:28px;font-size:16px;line-height:1.7">Em 3 dias, você constrói sua operação de receita completa — e sai com tudo pronto para implementar no dia seguinte.</p>
+      <div class="btn-wrap" style="margin-top:0">
+        <a class="btn btn-gradient" href="#">Quero minha vaga no Revenue Lab</a>
+        <a class="btn btn-ghost" href="#">Ver programação completa</a>
+      </div>
+    </div>
+
+    <!-- FEATURE CARDS -->
+    <p style="font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(242,242,242,.35);margin-bottom:12px">Cards de Prova / Feature</p>
+    <div class="grid-3">
+      <div class="card-glass">
+        <p style="font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--vibrant-blue),var(--baby-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px">+160%</p>
+        <p style="font-size:14px;font-weight:700;color:var(--cold-white);margin-bottom:6px">Crescimento médio</p>
+        <p style="font-size:13px;color:rgba(242,242,242,.5)">Em 12 meses após aplicação do Método REVENUE</p>
+      </div>
+      <div class="card-glass">
+        <p style="font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--vibrant-blue),var(--baby-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px">3x</p>
+        <p style="font-size:14px;font-weight:700;color:var(--cold-white);margin-bottom:6px">Mais oportunidades</p>
+        <p style="font-size:13px;color:rgba(242,242,242,.5)">De 6 para 19 reuniões qualificadas por vendedor/mês</p>
+      </div>
+      <div class="card-glass">
+        <p style="font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--vibrant-blue),var(--baby-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px">R$ 2M</p>
+        <p style="font-size:14px;font-weight:700;color:var(--cold-white);margin-bottom:6px">Nova receita — Artemec</p>
+        <p style="font-size:13px;color:rgba(242,242,242,.5)">Gerada no 1º semestre após intervenção Dealwise</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ EVITAR ══════════════════════════ -->
+<section id="evitar">
+  <div class="container">
+    <p class="section-label">09 — Diretrizes</p>
+    <h2>O que <span style="color:#ff6b6b">Evitar</span> e o que <span class="gradient-text">Fazer</span></h2>
+    <div style="height:32px"></div>
+    <div class="grid-3" style="margin-bottom:16px">
+      <div class="dont-card"><p class="dlbl">✗ Não usar</p><p>Branco puro #ffffff. Sempre Cold White #f2f2f2.</p></div>
+      <div class="dont-card"><p class="dlbl">✗ Não usar</p><p>Cores quentes (vermelho, laranja, amarelo). Quebram o universo técnico-premium.</p></div>
+      <div class="dont-card"><p class="dlbl">✗ Não usar</p><p>Fontes serifadas ou scripts. Revenue Lab é exclusivamente DM Sans.</p></div>
+      <div class="dont-card"><p class="dlbl">✗ Não fazer</p><p>Uniformizar "revenue" e "lab" na mesma cor. O contraste é identidade, não erro.</p></div>
+      <div class="dont-card"><p class="dlbl">✗ Não usar</p><p>Ícones genéricos de "vendas" (seta, cifrão, gráfico de barras). Foge do posicionamento.</p></div>
+      <div class="dont-card"><p class="dlbl">✗ Não usar</p><p>Tom visual de guru, infoproduto ou evento com balões. Somos técnicos e premium.</p></div>
+    </div>
+    <div class="grid-3">
+      <div class="do-card"><p class="dolbl">✓ Sempre fazer</p><p>Noise em fundos escuros. Textura que dá profundidade sem distração.</p></div>
+      <div class="do-card"><p class="dolbl">✓ Sempre fazer</p><p>CTA principal sempre em Vibrant Blue ou gradiente para Vibrant Blue.</p></div>
+      <div class="do-card"><p class="dolbl">✓ Sempre fazer</p><p>Usar SVGs originais para o logo. Nunca recriar manualmente.</p></div>
+      <div class="do-card"><p class="dolbl">✓ Sempre fazer</p><p>Composição limpa. Hierarquia visual clara. Menos é mais.</p></div>
+      <div class="do-card"><p class="dolbl">✓ Sempre fazer</p><p>Fotos dos founders com naming visível — "Vítor Baesso" e "Gabriel Machado".</p></div>
+      <div class="do-card"><p class="dolbl">✓ Sempre fazer</p><p>Gradiente em tipografia de impacto — Vibrant → Baby Blue, 135°.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <img src="Logotipo/Revenue Lab Export de versões do logo e heptagono_Revenue Lab versao principal alinhada a esquerda para fundos escuros com assinatura by dealwise.svg"
+         style="height:32px;margin-bottom:16px;display:block;margin:0 auto 16px" alt="Revenue Lab by Dealwise">
+    <p>Brandbook Revenue Lab by Dealwise · Versão 1.0 · 2026</p>
+    <p style="margin-top:6px">Arquivos SVG originais em <code style="color:var(--vibrant-blue)">/Logotipo/</code></p>
+  </div>
+</footer>
+
+</div><!-- end .page-content -->
+
+<!-- ══════════════════════════ BEAMS CANVAS JS ══════════════════════════ -->
+<script>
+(function() {
+  const canvas = document.getElementById('beams-canvas');
+  const ctx    = canvas.getContext('2d');
+  let beams    = [];
+  let raf;
+
+  const BEAM_COUNT = 28;
+
+  function rand(min, max) { return min + Math.random() * (max - min); }
+
+  function createBeam(index) {
+    const col     = index % 3;
+    const spacing = window.innerWidth / 3;
+    return {
+      x:         col * spacing + spacing / 2 + rand(-spacing * .4, spacing * .4),
+      y:         rand(window.innerHeight * .2, window.innerHeight * 1.2),
+      width:     rand(60, 140),
+      length:    window.innerHeight * 2.8,
+      angle:     rand(-38, -28),
+      speed:     rand(0.4, 1.0),
+      opacity:   rand(0.07, 0.16),
+      hue:       220 + (index * 30 / BEAM_COUNT) + rand(-8, 8),
+      pulse:     rand(0, Math.PI * 2),
+      pulseSpeed:rand(0.015, 0.035),
+    };
+  }
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width  = window.innerWidth  * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width  = window.innerWidth  + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.scale(dpr, dpr);
+    beams = Array.from({ length: BEAM_COUNT }, (_, i) => createBeam(i));
+  }
+
+  function resetBeam(beam, index) {
+    const col     = index % 3;
+    const spacing = window.innerWidth / 3;
+    beam.y        = window.innerHeight + 120;
+    beam.x        = col * spacing + spacing / 2 + rand(-spacing * .4, spacing * .4);
+    beam.width    = rand(80, 150);
+    beam.speed    = rand(0.4, 1.0);
+    beam.opacity  = rand(0.07, 0.16);
+    beam.hue      = 220 + (index * 30 / BEAM_COUNT) + rand(-8, 8);
+    return beam;
+  }
+
+  function drawBeam(beam) {
+    ctx.save();
+    ctx.translate(beam.x, beam.y);
+    ctx.rotate(beam.angle * Math.PI / 180);
+
+    const pulsingOpacity = beam.opacity * (0.8 + Math.sin(beam.pulse) * 0.2);
+    const g = ctx.createLinearGradient(0, 0, 0, beam.length);
+    g.addColorStop(0,   `hsla(${beam.hue},85%,68%,0)`);
+    g.addColorStop(0.1, `hsla(${beam.hue},85%,68%,${pulsingOpacity * 0.5})`);
+    g.addColorStop(0.4, `hsla(${beam.hue},85%,68%,${pulsingOpacity})`);
+    g.addColorStop(0.6, `hsla(${beam.hue},85%,68%,${pulsingOpacity})`);
+    g.addColorStop(0.9, `hsla(${beam.hue},85%,68%,${pulsingOpacity * 0.5})`);
+    g.addColorStop(1,   `hsla(${beam.hue},85%,68%,0)`);
+
+    ctx.fillStyle = g;
+    ctx.fillRect(-beam.width / 2, 0, beam.width, beam.length);
+    ctx.restore();
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.filter = 'blur(38px)';
+
+    beams.forEach((beam, i) => {
+      beam.y     -= beam.speed;
+      beam.pulse += beam.pulseSpeed;
+      if (beam.y + beam.length < -100) resetBeam(beam, i);
+      drawBeam(beam);
+    });
+
+    raf = requestAnimationFrame(animate);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  animate();
+})();
+</script>
+
+</body>
+</html>
