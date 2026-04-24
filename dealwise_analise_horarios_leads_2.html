@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dealwise — Análise de Horários de Leads · Meta Lead Ads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #080b12;
+    --surface:  #0f1320;
+    --card:     #141826;
+    --border:   rgba(255,255,255,0.07);
+    --border2:  rgba(255,255,255,0.12);
+    --accent:   #00C9A7;
+    --accent2:  #4F7FFF;
+    --accent3:  #FF6B6B;
+    --accent4:  #FFB347;
+    --purple:   #A78BFA;
+    --text:     #EEF0F8;
+    --muted:    rgba(238,240,248,0.45);
+    --muted2:   rgba(238,240,248,0.25);
+    --font:     'DM Sans', sans-serif;
+    --mono:     'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+  }
+
+  .logo { display: flex; align-items: center; gap: 16px; }
+
+  .logo-svg { height: 28px; width: auto; display: block; }
+  .logo-svg .st0 { fill: #fff; }
+
+  .logo-divider {
+    width: 1px; height: 28px;
+    background: var(--border2);
+    flex-shrink: 0;
+  }
+
+  .logo-sub { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  .header-meta { text-align: right; }
+  .header-meta .big { font-size: 15px; font-weight: 600; color: var(--accent); }
+  .header-meta .small { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* ─── NAV ─── */
+  .nav {
+    background: var(--surface);
+    display: flex;
+    gap: 0;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 13px 20px;
+    font-size: 13px; font-weight: 400;
+    color: var(--muted);
+    cursor: pointer;
+    border: none; background: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    font-family: var(--font);
+    transition: color 0.15s, border-color 0.15s;
+    letter-spacing: 0.1px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+  /* ─── LAYOUT ─── */
+  .main { padding: 28px 32px 48px; max-width: 1200px; margin: 0 auto; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ─── GRIDS ─── */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+
+  /* ─── METRIC CARD ─── */
+  .metric {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .metric::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-color, var(--accent)), transparent);
+    opacity: 0.6;
+  }
+  .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .metric-value { font-size: 30px; font-weight: 600; letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+  .metric-sub { font-size: 12px; color: var(--muted); }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 11px; font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 18px;
+  }
+
+  /* ─── INSIGHT CARDS ─── */
+  .insight {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 18px;
+  }
+  .insight.warn { border-left-color: var(--accent4); }
+  .insight.danger { border-left-color: var(--accent3); }
+  .insight-title { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+  .insight-body { font-size: 12px; color: var(--muted); line-height: 1.65; }
+
+  /* ─── BAR ROW ─── */
+  .bar-row {
+    display: grid;
+    grid-template-columns: 90px 44px 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .bar-row:last-child { border-bottom: none; }
+  .bar-day { font-size: 13px; font-weight: 500; }
+  .bar-count { font-size: 13px; font-weight: 600; }
+  .bar-track { background: rgba(255,255,255,0.05); border-radius: 3px; height: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; }
+  .bar-note { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* ─── HEATMAP ─── */
+  .heatmap-wrap { overflow-x: auto; }
+  .heatmap {
+    width: 100%; border-collapse: separate; border-spacing: 2px;
+    font-size: 11px; font-family: var(--mono);
+  }
+  .heatmap th {
+    color: var(--muted2); font-weight: 400; padding: 2px 0;
+    text-align: center; font-size: 10px; font-family: var(--font);
+  }
+  .heatmap td { text-align: center; padding: 5px 2px; border-radius: 4px; }
+  .heatmap .row-lbl { text-align: left; color: var(--muted); font-weight: 400; padding-right: 10px; font-size: 12px; font-family: var(--font); white-space: nowrap; }
+  .heatmap .total-lbl { color: var(--accent); font-weight: 600; font-family: var(--font); }
+
+  /* ─── BADGES ─── */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 9px; border-radius: 5px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .badge-urgente { background: rgba(255,107,107,0.15); color: #FF6B6B; }
+  .badge-alta    { background: rgba(255,179,71,0.15);  color: #FFB347; }
+  .badge-media   { background: rgba(79,127,255,0.15);  color: #4F7FFF; }
+  .badge-baixa   { background: rgba(255,255,255,0.07); color: var(--muted); }
+
+  /* ─── RECS TABLE ─── */
+  .rec-head, .rec-row {
+    display: grid;
+    grid-template-columns: 24px 110px 80px 1fr 1fr 1fr;
+    gap: 14px; align-items: start;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px; line-height: 1.55;
+  }
+  .rec-row:last-child { border-bottom: none; }
+  .rec-head {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.7px;
+    color: var(--muted2); padding-bottom: 10px; align-items: center;
+  }
+  .rec-num { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--accent); }
+  .rec-area { font-weight: 500; }
+  .rec-insight { color: var(--muted); }
+  .rec-acao { color: var(--text); }
+
+  /* ─── ANUNCIOS ─── */
+  .ad-row {
+    display: grid;
+    grid-template-columns: 20px 100px 1fr 36px 44px;
+    gap: 10px; align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .ad-row:last-child { border-bottom: none; }
+  .ad-rank { font-size: 11px; color: var(--muted2); font-family: var(--mono); }
+  .ad-name { font-size: 13px; font-weight: 500; }
+  .ad-track { background: rgba(255,255,255,0.05); border-radius: 3px; height: 5px; overflow: hidden; }
+  .ad-fill  { height: 100%; border-radius: 3px; }
+  .ad-leads { font-size: 13px; font-weight: 600; text-align: right; }
+  .ad-pct   { font-size: 11px; color: var(--muted); text-align: right; font-family: var(--mono); }
+
+  /* ─── LEGEND ─── */
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  @media (max-width: 700px) {
+    .main { padding: 16px; }
+    .header { padding: 14px 16px; }
+    .nav { padding: 0 8px; }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .rec-head, .rec-row { grid-template-columns: 1fr; }
+    .rec-head { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <svg class="logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 590.35 154.84" role="img" aria-label="Dealwise">
+      <style>.st0{fill:#fff}</style>
+      <g>
+        <path class="st0" d="M196.74,72.55c-1.59-2.29-3.66-4.06-6.2-5.3-2.55-1.24-5.53-1.86-8.97-1.86-4.39,0-8.35,1.1-11.88,3.29-3.53,2.19-6.3,5.19-8.3,8.97-2,3.79-3.01,8.13-3.01,13.03s1,9.06,3.01,12.88c2,3.82,4.72,6.81,8.16,8.97,3.43,2.16,7.35,3.24,11.74,3.24,2.61,0,4.9-.35,6.87-1.05,1.97-.7,3.66-1.64,5.06-2.82,1.4-1.18,2.58-2.43,3.53-3.77l1.53,6.49h11.83V45.93h-13.36v26.62ZM195.54,97.64c-1.05,2.04-2.53,3.63-4.44,4.77-1.91,1.14-4.1,1.72-6.58,1.72s-4.58-.57-6.49-1.72c-1.91-1.15-3.39-2.75-4.44-4.82-1.05-2.07-1.57-4.44-1.57-7.11s.53-4.93,1.57-6.97c1.05-2.04,2.53-3.63,4.44-4.77,1.91-1.14,4.07-1.72,6.49-1.72s4.68.57,6.58,1.72c1.91,1.15,3.39,2.74,4.44,4.77,1.05,2.04,1.57,4.39,1.57,7.06s-.52,5.03-1.57,7.06Z"/>
+        <path class="st0" d="M258.43,68.54c-3.59-2.1-7.78-3.15-12.55-3.15s-9.3,1.11-13.02,3.34c-3.72,2.23-6.62,5.26-8.68,9.11-2.07,3.85-3.1,8.25-3.1,13.22s1.05,9.21,3.15,12.93c2.1,3.72,5.01,6.62,8.73,8.68,3.72,2.07,8,3.1,12.83,3.1,3.82,0,7.25-.72,10.31-2.15,3.05-1.43,5.64-3.35,7.78-5.77,2.13-2.42,3.64-5.12,4.53-8.11h-13.65c-.76,1.53-1.89,2.77-3.39,3.72-1.5.95-3.39,1.43-5.68,1.43s-4.29-.51-6.01-1.53c-1.72-1.02-3.05-2.46-4.01-4.34-.76-1.5-1.21-3.21-1.36-5.1h35.23c.13-.89.21-1.72.24-2.48.03-.76.05-1.46.05-2.1,0-4.64-1-8.75-3.01-12.31-2-3.56-4.8-6.39-8.4-8.49ZM234.58,85.81c.25-1.36.64-2.57,1.18-3.63,1.02-1.97,2.42-3.47,4.2-4.48,1.78-1.02,3.75-1.53,5.92-1.53,2.86,0,5.26.88,7.2,2.62,1.94,1.75,3.01,4.09,3.2,7.01h-21.7Z"/>
+        <path class="st0" d="M314.15,67.68c-3.34-1.53-7.27-2.29-11.78-2.29-4.07,0-7.71.72-10.93,2.15-3.21,1.43-5.77,3.4-7.68,5.92-1.91,2.51-3.05,5.49-3.43,8.92h12.98c.38-2.04,1.38-3.56,3.01-4.58,1.62-1.02,3.61-1.53,5.96-1.53,2.16,0,3.9.38,5.2,1.15,1.3.76,2.26,1.89,2.86,3.39.6,1.5.91,3.39.91,5.68h-11.83c-4.58,0-8.4.64-11.45,1.91-3.05,1.27-5.31,3.02-6.77,5.25-1.46,2.23-2.2,4.77-2.2,7.63,0,2.67.62,5.1,1.86,7.3,1.24,2.19,3.18,3.95,5.82,5.25,2.64,1.3,5.93,1.96,9.88,1.96,1.91,0,3.64-.21,5.2-.62,1.56-.41,2.97-.99,4.25-1.72,1.27-.73,2.4-1.61,3.39-2.62.99-1.02,1.8-2.16,2.43-3.44l1.53,7.25h11.26v-29.77c0-4.2-.91-7.73-2.72-10.59-1.81-2.86-4.39-5.06-7.73-6.58ZM310.67,94.59c-.19,1.53-.57,2.94-1.15,4.25-.57,1.3-1.3,2.47-2.2,3.48-.89,1.02-1.97,1.8-3.24,2.34-1.27.54-2.7.81-4.29.81-1.34,0-2.51-.19-3.53-.57-1.02-.38-1.81-.99-2.39-1.81-.57-.83-.86-1.81-.86-2.96,0-1.08.29-2.05.86-2.91.57-.86,1.45-1.53,2.62-2,1.18-.48,2.69-.72,4.53-.72h9.64v.1Z"/>
+        <rect class="st0" x="336.62" y="45.93" width="13.36" height="68.7"/>
+        <polygon class="st0" points="409.43 103.27 398.74 66.54 388.05 66.54 377.35 103.29 367.73 66.54 358.28 66.54 372.4 114.63 382.14 114.63 393.39 76.19 404.65 114.63 414.48 114.63 428.6 66.54 418.97 66.54 409.43 103.27"/>
+        <rect class="st0" x="437.86" y="66.54" width="9.54" height="48.09"/>
+        <path class="st0" d="M442.73,45.45c-1.85,0-3.36.56-4.53,1.67-1.18,1.11-1.77,2.53-1.77,4.25s.59,3.24,1.77,4.39c1.18,1.14,2.69,1.72,4.53,1.72s3.28-.57,4.49-1.72c1.21-1.15,1.81-2.61,1.81-4.39s-.61-3.13-1.81-4.25c-1.21-1.11-2.71-1.67-4.49-1.67Z"/>
+        <path class="st0" d="M489.77,88.48c-2.67-.95-5.69-1.75-9.06-2.39-2.35-.51-4.34-1.06-5.96-1.67-1.62-.6-2.85-1.35-3.67-2.24-.83-.89-1.24-1.91-1.24-3.05,0-1.78.73-3.21,2.2-4.29,1.46-1.08,3.56-1.62,6.3-1.62s4.93.59,6.58,1.77c1.65,1.18,2.61,2.85,2.86,5.01h9.26c-.57-4.64-2.48-8.24-5.73-10.78-3.24-2.54-7.54-3.82-12.88-3.82-3.69,0-6.89.62-9.59,1.86-2.7,1.24-4.79,2.96-6.25,5.15-1.46,2.19-2.2,4.66-2.2,7.39,0,2.29.48,4.22,1.43,5.77.95,1.56,2.24,2.85,3.86,3.86,1.62,1.02,3.47,1.86,5.53,2.53,2.07.67,4.21,1.19,6.44,1.57,2.35.45,4.37.94,6.06,1.48,1.68.54,2.96,1.27,3.82,2.19.86.92,1.29,2.27,1.29,4.06,0,1.21-.32,2.34-.95,3.39-.64,1.05-1.64,1.88-3.01,2.48-1.37.61-3.1.91-5.2.91-2.23,0-4.15-.38-5.77-1.15-1.62-.76-2.9-1.78-3.82-3.05-.92-1.27-1.54-2.67-1.86-4.2h-9.73c.38,3.24,1.46,6.08,3.25,8.49,1.78,2.42,4.2,4.29,7.25,5.63,3.05,1.34,6.62,2,10.69,2s7.24-.64,10.07-1.91c2.83-1.27,5.02-3.05,6.58-5.34,1.56-2.29,2.3-4.93,2.24-7.92,0-3.43-.8-6.07-2.39-7.92-1.59-1.84-3.72-3.24-6.39-4.2Z"/>
+        <path class="st0" d="M551.69,76.89c-1.85-3.47-4.45-6.25-7.82-8.35-3.37-2.1-7.41-3.15-12.12-3.15s-8.84,1.07-12.4,3.2c-3.56,2.13-6.35,5.09-8.35,8.87-2,3.79-3.01,8.22-3.01,13.31s1,9.32,3.01,13.07c2,3.75,4.79,6.68,8.35,8.78,3.56,2.1,7.63,3.15,12.21,3.15,3.75,0,7.08-.67,9.97-2,2.9-1.34,5.33-3.16,7.3-5.49,1.97-2.32,3.37-4.95,4.2-7.87h-9.54c-.95,2.29-2.42,4.1-4.39,5.44-1.97,1.34-4.49,2-7.54,2-2.55,0-4.9-.62-7.06-1.86-2.16-1.24-3.9-3.08-5.2-5.53-1.12-2.11-1.73-4.65-1.89-7.59h36.86c.06-.89.11-1.7.14-2.43.03-.73.05-1.42.05-2.05,0-4.2-.92-8.03-2.77-11.5ZM517.5,86.1c.26-2.26.85-4.23,1.8-5.87,1.3-2.26,3.04-3.97,5.2-5.15,2.16-1.18,4.55-1.77,7.16-1.77,3.69,0,6.77,1.13,9.25,3.39,2.48,2.26,3.82,5.39,4.01,9.4h-27.42Z"/>
+      </g>
+      <g>
+        <path class="st0" d="M132.07,80.05c0-5.13-.81-10.18-2.41-15.04h-62.26c-8.28,0-15.01,6.73-15.01,15.01v15.06h77.27c1.6-4.85,2.41-9.91,2.41-15.04Z"/>
+        <path class="st0" d="M94.63,33.14c-5.58,2.36-9.17,7.73-9.17,13.81v15.06h43.1c-5.87-14.48-18.67-25.41-33.93-28.87Z"/>
+        <path class="st0" d="M35.86,113.14v15.01h48.11c19.63,0,37.29-12,44.6-30.07H50.92c-8.3,0-15.06,6.75-15.06,15.06Z"/>
+      </g>
+    </svg>
+    <div class="logo-divider"></div>
+    <div class="logo-sub">Análise de Horários · Meta Lead Ads</div>
+  </div>
+  <div class="header-meta">
+    <div class="big">431 leads analisados</div>
+    <div class="small">20/03/2026 – 23/04/2026</div>
+  </div>
+</header>
+
+<nav class="nav">
+  <button class="tab active" onclick="showTab('dashboard',this)">Dashboard</button>
+  <button class="tab" onclick="showTab('semana',this)">Por Dia da Semana</button>
+  <button class="tab" onclick="showTab('horario',this)">Por Faixa Horária</button>
+  <button class="tab" onclick="showTab('heatmap',this)">Heatmap Dia × Hora</button>
+  <button class="tab" onclick="showTab('anuncios',this)">Por Anúncio</button>
+  <button class="tab" onclick="showTab('recs',this)">Recomendações</button>
+</nav>
+
+<main class="main">
+
+  <!-- ══════════ DASHBOARD ══════════ -->
+  <section id="s-dashboard" class="section active">
+    <div class="grid-4">
+      <div class="metric" style="--accent-color: var(--accent)">
+        <div class="metric-label">Total de leads</div>
+        <div class="metric-value" style="color:var(--accent)">431</div>
+        <div class="metric-sub">20/03 – 23/04/2026</div>
+      </div>
+      <div class="metric" style="--accent-color: var(--accent2)">
+        <div class="metric-label">Pós-trabalho Seg–Qui</div>
+        <div class="metric-value" style="color:var(--accent2)">105</div>
+        <div class="metric-sub">24.4% do total</div>
+      </div>
+      <div class="metric" style="--accent-color: var(--accent4)">
+        <div class="metric-label">Final de semana</div>
+        <div class="metric-value" style="color:var(--accent4)">142</div>
+        <div class="metric-sub">32.9% — Sex 18h até Dom</div>
+      </div>
+      <div class="metric" style="--accent-color: var(--accent3)">
+        <div class="metric-label">Horário comercial</div>
+        <div class="metric-value" style="color:var(--accent3)">83</div>
+        <div class="metric-sub">19.3% — Seg–Sex 9h–18h</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="insight">
+        <div class="insight-title">Pós-trabalho Seg–Qui</div>
+        <div class="insight-body">105 leads = 24.4% do total. O horário de pós-trabalho gera 1 em cada 4 leads. Alta intenção — precisam de resposta rápida ainda na noite.</div>
+      </div>
+      <div class="insight warn">
+        <div class="insight-title">Final de semana estendido (Sex 18h – Dom 23h59)</div>
+        <div class="insight-body">142 leads = 32.9% do total. Quase 1 em cada 3 leads chega no fds. Sem cobertura, a taxa de contato despenca.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Distribuição por período</div>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#FFB347"></span>Final de semana — 32.9%</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#4F7FFF"></span>Pós-trabalho — 24.4%</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#00C9A7"></span>Amanhecer — 17.4%</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#FF6B6B"></span>Horário comercial — 19.3%</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#A78BFA"></span>Madrugada — 12.8%</span>
+      </div>
+      <div style="position:relative; height:260px;">
+        <canvas id="pieChart" role="img" aria-label="Distribuição de leads por período">Final de semana 142, Pós-trabalho 105, Horário comercial 83, Madrugada 55, Amanhecer 75.</canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ SEMANA ══════════ -->
+  <section id="s-semana" class="section">
+    <div class="card">
+      <div class="card-title">Volume de leads por dia da semana</div>
+      <div style="position:relative; height:260px;">
+        <canvas id="semanaChart" role="img" aria-label="Leads por dia da semana">Segunda 58, Terça 69, Quarta 66, Quinta 68, Sexta 50, Sábado 57, Domingo 63.</canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Detalhamento por dia</div>
+      <div id="semana-rows"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ HORARIO ══════════ -->
+  <section id="s-horario" class="section">
+    <div class="card">
+      <div class="card-title">Volume de leads por faixa horária</div>
+      <div style="position:relative; height:260px;">
+        <canvas id="horarioChart" role="img" aria-label="Leads por faixa horária">00h-06h: 55, 06h-09h: 75, 09h-12h: 39, 12h-15h: 49, 15h-18h: 50, 18h-21h: 77, 21h-24h: 86.</canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Implicações para o time</div>
+      <div id="horario-rows"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ HEATMAP ══════════ -->
+  <section id="s-heatmap" class="section">
+    <div class="card">
+      <div class="card-title">Heatmap — leads por dia × hora do dia</div>
+      <div class="heatmap-wrap">
+        <table class="heatmap">
+          <thead><tr id="hmap-head"></tr></thead>
+          <tbody id="hmap-body"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:16px; display:flex; align-items:center; gap:8px; font-size:11px; color:var(--muted);">
+        <span>Menos</span>
+        <div style="display:flex; gap:2px; align-items:center;">
+          <div style="width:14px;height:14px;border-radius:3px;background:rgba(79,127,255,0.07)"></div>
+          <div style="width:14px;height:14px;border-radius:3px;background:rgba(79,127,255,0.22)"></div>
+          <div style="width:14px;height:14px;border-radius:3px;background:rgba(79,127,255,0.42)"></div>
+          <div style="width:14px;height:14px;border-radius:3px;background:rgba(79,127,255,0.65)"></div>
+          <div style="width:14px;height:14px;border-radius:3px;background:rgba(79,127,255,0.9)"></div>
+        </div>
+        <span>Mais leads</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ ANUNCIOS ══════════ -->
+  <section id="s-anuncios" class="section">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Ranking por criativo</div>
+        <div id="ad-rows"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Concentração de volume</div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-dot" style="background:#00C9A7"></span>ADV09 — 50.1%</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#4F7FFF"></span>ADV07 — 19.7%</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#FFB347"></span>ADV06 — 9.0%</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#A78BFA"></span>ADV02 — 7.2%</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#FF6B6B"></span>ADV_Eng — 6.5%</span>
+          <span class="legend-item"><span class="legend-dot" style="background:rgba(255,255,255,0.2)"></span>Outros — 7.5%</span>
+        </div>
+        <div style="position:relative; height:260px;">
+          <canvas id="adChart" role="img" aria-label="Distribuição de leads por anúncio">ADV09: 216, ADV07: 85, ADV06: 39, ADV02: 31, ADV_Engenharia: 28, outros: 32.</canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ RECOMENDAÇÕES ══════════ -->
+  <section id="s-recs" class="section">
+    <div class="card">
+      <div class="card-title">Recomendações estratégicas — Tráfego & Pré-Vendas</div>
+      <div class="rec-head">
+        <span>#</span><span>Área</span><span>Prioridade</span>
+        <span>Insight</span><span>Ação recomendada</span><span>Impacto esperado</span>
+      </div>
+      <div id="rec-rows"></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ── Tab switching ──
+function showTab(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('s-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── Chart defaults ──
+const ACCENT='#00C9A7', ACCENT2='#4F7FFF', ACCENT3='#FF6B6B', ACCENT4='#FFB347', PURPLE='#A78BFA';
+const MUTED='rgba(238,240,248,0.45)', GRID='rgba(255,255,255,0.06)';
+Chart.defaults.color = MUTED;
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+// ── DASHBOARD DONUT ──
+new Chart(document.getElementById('pieChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Final de semana','Pós-trabalho Seg–Qui','Horário comercial','Madrugada','Amanhecer 06h–09h'],
+    datasets: [{
+      data: [142, 105, 83, 55, 75],
+      backgroundColor: [ACCENT4, ACCENT2, ACCENT3, PURPLE, ACCENT],
+      borderWidth: 0, hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false, cutout:'66%',
+    plugins: { legend:{display:false} }
+  }
+});
+
+// ── SEMANA ──
+const semanaData = [
+  {dia:'Segunda', leads:58, pct:13.5, rec:'Volume consistente ao longo do dia.'},
+  {dia:'Terça',   leads:69, pct:16.0, rec:'2º maior dia — garantir cobertura total do SDR.'},
+  {dia:'Quarta',  leads:66, pct:15.3, rec:'Bom dia para follow-up de leads Seg/Ter.'},
+  {dia:'Quinta',  leads:68, pct:15.8, rec:'Fechar semana forte — foco em agendamento.'},
+  {dia:'Sexta',   leads:50, pct:11.6, rec:'Manhã comercial ativa; após 18h entra no fds estendido.'},
+  {dia:'Sábado',  leads:57, pct:13.2, rec:'Considerar plantão ou bot de qualificação.'},
+  {dia:'Domingo', leads:63, pct:14.6, rec:'2º maior dia — leads chegam principalmente à noite.'},
+];
+new Chart(document.getElementById('semanaChart'), {
+  type:'bar',
+  data:{
+    labels: semanaData.map(d=>d.dia),
+    datasets:[{
+      data: semanaData.map(d=>d.leads),
+      backgroundColor: semanaData.map(d=>d.leads>=65?ACCENT:d.leads>=57?ACCENT2:ACCENT4),
+      borderRadius:5, borderSkipped:false
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{color:GRID}, ticks:{font:{size:12}}},
+      y:{grid:{color:GRID}, min:0, max:80, ticks:{stepSize:20}}
+    }
+  }
+});
+const sRows = document.getElementById('semana-rows');
+semanaData.forEach(d=>{
+  const c = d.leads>=65?ACCENT:d.leads>=57?ACCENT2:ACCENT4;
+  const div=document.createElement('div'); div.className='bar-row';
+  div.innerHTML=`<span class="bar-day">${d.dia}</span>
+    <span class="bar-count" style="color:${c}">${d.leads}</span>
+    <div class="bar-track"><div class="bar-fill" style="width:${Math.round(d.leads/69*100)}%;background:${c}"></div></div>
+    <span class="bar-note">${d.rec}</span>`;
+  sRows.appendChild(div);
+});
+
+// ── HORARIO ──
+const horData = [
+  {f:'00h–06h', leads:55, tipo:'Madrugada',          impl:'Bot de resposta automática essencial.'},
+  {f:'06h–09h', leads:75, tipo:'Amanhecer',           impl:'Pico matinal — resposta antes das 9h gera alto impacto.'},
+  {f:'09h–12h', leads:39, tipo:'Manhã comercial',     impl:'Paradoxo: volume baixo no horário comercial — leads estão no trabalho.'},
+  {f:'12h–15h', leads:49, tipo:'Almoço/início tarde', impl:'Volume moderado — pico no intervalo de almoço.'},
+  {f:'15h–18h', leads:50, tipo:'Tarde comercial',     impl:'Leads ainda no trabalho — volume baixo.'},
+  {f:'18h–21h', leads:77, tipo:'Pós-trabalho',        impl:'2º maior bloco — hora de ouro para o SDR.'},
+  {f:'21h–24h', leads:86, tipo:'Noite PICO',          impl:'MAIOR faixa horária — 20% dos leads. Exige cobertura ou bot.'},
+];
+new Chart(document.getElementById('horarioChart'), {
+  type:'bar',
+  data:{
+    labels: horData.map(d=>d.f),
+    datasets:[{
+      data: horData.map(d=>d.leads),
+      backgroundColor: horData.map(d=>d.leads>=75?ACCENT:d.leads>=55?ACCENT2:ACCENT4),
+      borderRadius:5, borderSkipped:false
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{color:GRID}, ticks:{font:{size:11}, maxRotation:0, autoSkip:false}},
+      y:{grid:{color:GRID}, min:0, max:100}
+    }
+  }
+});
+const hRows = document.getElementById('horario-rows');
+horData.forEach(d=>{
+  const c=d.leads>=75?ACCENT:d.leads>=55?ACCENT2:ACCENT4;
+  const div=document.createElement('div'); div.className='bar-row';
+  div.innerHTML=`<span class="bar-day">${d.f}</span>
+    <span class="bar-count" style="color:${c}">${d.leads}</span>
+    <div class="bar-track"><div class="bar-fill" style="width:${Math.round(d.leads/86*100)}%;background:${c}"></div></div>
+    <span class="bar-note">${d.impl}</span>`;
+  hRows.appendChild(div);
+});
+
+// ── HEATMAP ──
+const hmData = [
+  {dia:'Segunda', v:[4,1,0,1,0,0,1,3,5,4,1,1,2,2,1,2,2,3,3,5,6,5,4,2]},
+  {dia:'Terça',   v:[3,4,0,1,0,2,6,7,2,5,3,0,2,2,2,1,2,2,1,2,2,6,6,8]},
+  {dia:'Quarta',  v:[2,3,1,2,2,4,4,3,4,1,0,1,4,3,1,3,0,2,1,3,7,3,5,7]},
+  {dia:'Quinta',  v:[3,3,1,1,0,2,4,7,4,1,2,2,1,4,3,1,0,0,4,6,8,5,5,1]},
+  {dia:'Sexta',   v:[2,0,0,0,1,1,2,5,0,1,1,0,3,2,2,2,3,3,4,1,3,4,6,4]},
+  {dia:'Sábado',  v:[2,0,1,2,2,0,1,2,3,2,1,2,0,1,6,4,7,3,3,4,3,2,1,5]},
+  {dia:'Domingo', v:[3,0,0,0,1,0,3,3,6,7,3,1,3,3,2,3,4,3,5,4,2,5,1,1]},
+];
+const maxV=9;
+const head=document.getElementById('hmap-head');
+head.innerHTML='<th class="row-lbl">Dia</th>'+Array.from({length:24},(_,i)=>`<th>${String(i).padStart(2,'0')}h</th>`).join('')+'<th style="color:var(--accent)">Total</th>';
+const tbody=document.getElementById('hmap-body');
+hmData.forEach(row=>{
+  const total=row.v.reduce((a,b)=>a+b,0);
+  const tr=document.createElement('tr');
+  let html=`<td class="row-lbl">${row.dia}</td>`;
+  row.v.forEach(v=>{
+    const i=v===0?0:0.07+(v/maxV)*0.83;
+    const bg=v===0?'rgba(255,255,255,0.03)':`rgba(79,127,255,${i.toFixed(2)})`;
+    const col=i>0.4?'#fff':'var(--muted)';
+    html+=`<td style="background:${bg};color:${col}">${v||''}</td>`;
+  });
+  html+=`<td class="total-lbl">${total}</td>`;
+  tr.innerHTML=html; tbody.appendChild(tr);
+});
+const totRow=document.createElement('tr');
+const colTotals=Array.from({length:24},(_,h)=>hmData.reduce((s,r)=>s+r.v[h],0));
+totRow.innerHTML=`<td class="row-lbl" style="color:var(--accent);font-weight:600;">Total</td>`
+  +colTotals.map(v=>`<td style="color:var(--muted2);font-size:10px;">${v}</td>`).join('')
+  +`<td class="total-lbl">431</td>`;
+tbody.appendChild(totRow);
+
+// ── ANUNCIOS ──
+const adData = [
+  {n:'ADV09',    leads:216, pct:'50.1%'},
+  {n:'ADV07',    leads:85,  pct:'19.7%'},
+  {n:'ADV06',    leads:39,  pct:'9.0%'},
+  {n:'ADV02',    leads:31,  pct:'7.2%'},
+  {n:'ADV_Eng',  leads:28,  pct:'6.5%'},
+  {n:'ADV08',    leads:8,   pct:'1.9%'},
+  {n:'ADV01',    leads:7,   pct:'1.6%'},
+  {n:'ADV10',    leads:5,   pct:'1.2%'},
+  {n:'ADV04',    leads:4,   pct:'0.9%'},
+  {n:'ADE01',    leads:3,   pct:'0.7%'},
+  {n:'ADV05',    leads:2,   pct:'0.5%'},
+  {n:'ADV07 Copy',leads:1,  pct:'0.2%'},
+];
+const adRows=document.getElementById('ad-rows');
+adData.forEach((d,i)=>{
+  const c=i===0?ACCENT:i===1?ACCENT2:i<5?ACCENT4:'rgba(255,255,255,0.2)';
+  const tw=i<2?'color:var(--text)':'color:var(--muted)';
+  const div=document.createElement('div'); div.className='ad-row';
+  div.innerHTML=`<span class="ad-rank">#${i+1}</span>
+    <span class="ad-name" style="${tw}">${d.n}</span>
+    <div class="ad-track"><div class="ad-fill" style="width:${Math.round(d.leads/216*100)}%;background:${c}"></div></div>
+    <span class="ad-leads" style="color:${i<2?ACCENT:MUTED}">${d.leads}</span>
+    <span class="ad-pct">${d.pct}</span>`;
+  adRows.appendChild(div);
+});
+new Chart(document.getElementById('adChart'),{
+  type:'doughnut',
+  data:{
+    labels:['ADV09','ADV07','ADV06','ADV02','ADV_Eng','Outros'],
+    datasets:[{
+      data:[216,85,39,31,28,32],
+      backgroundColor:[ACCENT,ACCENT2,ACCENT4,PURPLE,ACCENT3,'rgba(255,255,255,0.15)'],
+      borderWidth:0, hoverOffset:6
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}}
+});
+
+// ── RECOMENDAÇÕES ──
+const recsData=[
+  {n:'1',area:'Tráfego Pago',pri:'urgente',insight:'57.3% dos leads chegam fora do horário comercial (pós-18h + fds)',acao:'Usar dayparting no Meta para concentrar budget nas janelas 18h-24h e sáb/dom. Não pausar campanhas à noite.',impacto:'Redução de CPL, aumento de volume qualificado',ic:ACCENT3},
+  {n:'2',area:'Pré-Vendas',  pri:'urgente',insight:'142 leads (32.9%) chegam no fds estendido: Sex 18h até Dom 23h59',acao:'Implementar plantão de SDR no fds OU bot de qualificação no WhatsApp com resposta automática + agendamento.',impacto:'Taxa de contato sobe de ~30% para 60–70%',ic:ACCENT3},
+  {n:'3',area:'Pré-Vendas',  pri:'alta',   insight:'21h–24h é a MAIOR faixa horária: 86 leads (20% do total)',acao:'Criar fluxo automático via WhatsApp/CRM para 21h–24h. SDR prioriza ligação cedo na manhã seguinte.',impacto:'Aumento de conexão com leads de alta intenção',ic:ACCENT4},
+  {n:'4',area:'Tráfego Pago',pri:'alta',   insight:'ADV09 concentra 50% de todos os leads (216/431)',acao:'Escalar budget do ADV09. Testar variações do mesmo conceito (A/B). Pausar anúncios com menos de 2% do volume.',impacto:'Escala de volume sem perder CPL',ic:ACCENT4},
+  {n:'5',area:'Pré-Vendas',  pri:'media',  insight:'Terça é o maior dia (69 leads, 16%). Domingo também é forte (63 leads, 14.6%)',acao:'Reforçar equipe nas terças. Para domingo, configurar sequência automática de ativação para segunda de manhã.',impacto:'Aumento de taxa de agendamento semanal',ic:ACCENT2},
+  {n:'6',area:'Tráfego Pago',pri:'media',  insight:'12.8% chegam de madrugada (0h–6h): 55 leads',acao:'Analisar qualidade. Se equivalente, manter. Se baixa, aplicar redução de bid 0h–6h.',impacto:'Otimização de verba em slots não rentáveis',ic:ACCENT2},
+  {n:'7',area:'Tráfego Pago',pri:'baixa',  insight:'Horário comercial tem apenas 19.3% do volume apesar de receber grande parte do budget',acao:'Redistribuir budget do horário comercial para 18h–24h. Monitorar CPL por período para validar hipótese.',impacto:'Eficiência de verba sem reduzir volume',ic:MUTED},
+];
+const recRows=document.getElementById('rec-rows');
+recsData.forEach(r=>{
+  const div=document.createElement('div'); div.className='rec-row';
+  div.innerHTML=`<span class="rec-num">${r.n}</span>
+    <span class="rec-area">${r.area}</span>
+    <span><span class="badge badge-${r.pri}">${r.pri.toUpperCase()}</span></span>
+    <span class="rec-insight">${r.insight}</span>
+    <span class="rec-acao">${r.acao}</span>
+    <span style="color:${r.ic};font-size:12px;line-height:1.55;">${r.impacto}</span>`;
+  recRows.appendChild(div);
+});
+</script>
+</body>
+</html>
